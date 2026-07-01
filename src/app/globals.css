@@ -71,6 +71,31 @@ body {
   to { filter: hue-rotate(360deg); }
 }
 
+/* ─── Dice roll animation + critical flourishes ─── */
+@keyframes dice-tumble {
+  0% { transform: scale(0.4) rotate(-180deg); opacity: 0; }
+  55% { transform: scale(1.18) rotate(12deg); opacity: 1; }
+  70% { transform: scale(0.96) rotate(-4deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+@keyframes dice-settle-out {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.8) translateY(-14px); opacity: 0; }
+}
+@keyframes crit-ring {
+  0% { transform: scale(0.3); opacity: 0.85; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+@keyframes crit-spark {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; }
+}
+@keyframes fx-label {
+  0% { transform: translateY(8px) scale(0.8); opacity: 0; }
+  30% { transform: translateY(0) scale(1.05); opacity: 1; }
+  100% { transform: translateY(-2px) scale(1); opacity: 1; }
+}
+
 /* Accessibility floor: honour reduced-motion preferences. */
 @media (prefers-reduced-motion: reduce) {
   *,

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { CONDITIONS, TERRAINS, getTerrain } from '@/lib/dnd';
+import { CONDITIONS, TERRAINS } from '@/lib/dnd';
 import {
   addCustomCombatant,
   addMonsterCombatant,
@@ -17,6 +17,7 @@ import {
   startEncounter,
   toggleCombatantCondition,
 } from '@/app/combat-actions';
+import { performDice, performRoll, type Adv } from '@/lib/game/roll';
 import { Chip, Panel, cn } from '@/app/crea/ui';
 import {
   currentCombatantId,
@@ -25,7 +26,9 @@ import {
   sideColor,
   sideLabel,
 } from '@/lib/combat/util';
+import { parseMonsterAttacks } from '@/lib/combat/monster-attacks';
 import { MonsterBrowser } from './MonsterBrowser';
+import { SceneHeader } from './SceneHeader';
 import type { CampaignState } from '@/lib/game/repo';
 import type { Combatant } from '@/db';
 
@@ -38,10 +41,14 @@ export function CombatPanel({
   token,
   state,
   refresh,
+  adv = 'normal',
+  secret = false,
 }: {
   token: string;
   state: CampaignState;
   refresh: () => void;
+  adv?: Adv;
+  secret?: boolean;
 }) {
   const run: Run = async (p) => {
     try {
@@ -54,7 +61,7 @@ export function CombatPanel({
 
   if (!enc) return <NewEncounterForm token={token} run={run} />;
   if (enc.status === 'draft') return <EncounterBuilder token={token} state={state} run={run} />;
-  return <ActiveCombat token={token} state={state} run={run} />;
+  return <ActiveCombat token={token} state={state} run={run} adv={adv} secret={secret} />;
 }
 
 function NewEncounterForm({ token, run }: { token: string; run: Run }) {
@@ -219,16 +226,28 @@ function CustomCombatantForm({ token, run }: { token: string; run: Run }) {
   );
 }
 
-function ActiveCombat({ token, state, run }: { token: string; state: CampaignState; run: Run }) {
+function ActiveCombat({
+  token,
+  state,
+  run,
+  adv,
+  secret,
+}: {
+  token: string;
+  state: CampaignState;
+  run: Run;
+  adv: Adv;
+  secret: boolean;
+}) {
   const enc = state.encounter!;
   const ordered = orderByInitiative(state.combatants);
   const currentId = currentCombatantId(enc, state.combatants);
-  const terrain = getTerrain(enc.terrain);
+  const pcId = state.combatants.find((c) => c.side === 'player')?.id ?? null;
 
   return (
-    <Panel
-      title={`Combattimento: ${enc.name} · ${terrain?.name ?? ''} · Round ${enc.round}`}
-    >
+    <div className="space-y-3">
+      <SceneHeader terrainKey={enc.terrain} round={enc.round} encounter={enc.name} />
+      <Panel title="Turni">
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <button type="button" onClick={() => run(prevTurn(token))} className="rounded-md border border-ink-border px-3 py-1.5 text-sm text-parchment hover:border-gold">
           ← Turno
@@ -251,6 +270,9 @@ function ActiveCombat({ token, state, run }: { token: string; state: CampaignSta
             token={token}
             combatant={c}
             active={c.id === currentId}
+            adv={adv}
+            secret={secret}
+            pcId={pcId}
             pcHp={
               c.side === 'player' && state.character?.sheet
                 ? {
@@ -270,7 +292,8 @@ function ActiveCombat({ token, state, run }: { token: string; state: CampaignSta
           <MonsterBrowser onAdd={(index, side, count) => run(addMonsterCombatant(token, index, side, count))} />
         </div>
       </details>
-    </Panel>
+      </Panel>
+    </div>
   );
 }
 
@@ -278,17 +301,25 @@ function CombatantRow({
   token,
   combatant: c,
   active,
+  adv,
+  secret,
+  pcId,
   pcHp,
   run,
 }: {
   token: string;
   combatant: Combatant;
   active: boolean;
+  adv: Adv;
+  secret: boolean;
+  pcId: number | null;
   pcHp: { current: number; max: number } | null;
   run: Run;
 }) {
   const [dmg, setDmg] = useState('');
+  const [lastDmg, setLastDmg] = useState<number | null>(null);
   const isPc = c.side === 'player';
+  const attacks = c.side === 'enemy' ? parseMonsterAttacks(c.statblock?.description) : [];
   const hpText = pcHp
     ? `${pcHp.current}/${pcHp.max}`
     : `${c.currentHp ?? '—'}/${c.maxHp ?? '—'}`;
@@ -370,6 +401,47 @@ function CombatantRow({
           </button>
         )}
       </div>
+
+      {attacks.length > 0 && (
+        <div className="mt-2 space-y-1.5 rounded-md border border-ink-border/70 bg-[color:var(--color-ink)] p-2">
+          <p className="text-[11px] uppercase tracking-wide text-ochre">
+            Attacchi{secret ? ' · segreti' : ''}
+          </p>
+          {attacks.map((a, i) => (
+            <div key={i} className="flex flex-wrap items-center gap-1.5">
+              <span className="min-w-16 text-xs text-parchment">{a.name}</span>
+              <button
+                type="button"
+                onClick={() =>
+                  run(performRoll(token, `${c.name} · ${a.name} (colpire)`, a.toHit, adv, undefined, secret))
+                }
+                className="rounded-md border border-gold/60 px-2 py-0.5 text-xs text-parchment hover:border-gold"
+              >
+                Colpire {a.toHit >= 0 ? `+${a.toHit}` : a.toHit}
+              </button>
+              <button
+                type="button"
+                onClick={() => run(performDice(token, a.damage, secret).then((r) => setLastDmg(r.total)))}
+                className="rounded-md border border-ochre/60 px-2 py-0.5 text-xs text-parchment hover:border-ochre"
+              >
+                Danni {a.damage}
+              </button>
+            </div>
+          ))}
+          {lastDmg != null && pcId != null && (
+            <button
+              type="button"
+              onClick={() => {
+                run(damageCombatant(token, pcId, -lastDmg));
+                setLastDmg(null);
+              }}
+              className="rounded-md border border-flag-red/60 px-2 py-0.5 text-xs text-parchment hover:border-flag-red"
+            >
+              Infliggi {lastDmg} al PG →
+            </button>
+          )}
+        </div>
+      )}
 
       {!isPc && (
         <details className="mt-2">

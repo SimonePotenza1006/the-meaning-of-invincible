@@ -614,6 +614,31 @@ export async function saveDmNotes(dmToken: string, text: string) {
   return { ok: true };
 }
 
+// ─── Heroic Inspiration (DM grants, player spends for advantage) ──────────
+export async function setInspiration(dmToken: string, value: boolean) {
+  return mutate(
+    dmToken,
+    (s) => {
+      if (s.inspiration === value) return;
+      s.inspiration = value;
+      return {
+        kind: 'note',
+        actor: 'dm',
+        message: value ? 'Il DM concede l’Ispirazione ✦' : 'Ispirazione rimossa.',
+      };
+    },
+    { dmOnly: true },
+  );
+}
+
+export async function spendInspiration(tok: string) {
+  return mutate(tok, (s) => {
+    if (!s.inspiration) return { kind: 'note', message: 'Nessuna Ispirazione da spendere.' };
+    s.inspiration = false;
+    return { kind: 'note', message: 'Spende l’Ispirazione: tira con vantaggio ✦' };
+  });
+}
+
 // ─── NPC roster (DM-only, stored on the campaign row) ─────────────────────
 async function requireDm(dmToken: string) {
   const found = await findByToken(dmToken);

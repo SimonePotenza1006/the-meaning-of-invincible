@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from 'react';
 import { cn } from '@/app/crea/ui';
+import { RollEffects } from '@/components/RollEffects';
 
 export interface ShellSection {
   id: string;
@@ -44,6 +45,7 @@ export function SheetShell({
 
   return (
     <div className="flex h-[100dvh] overflow-hidden">
+      <RollEffects />
       {/* Sidebar */}
       <aside className="flex w-16 shrink-0 flex-col border-r border-ink-border bg-ink-raised/40 sm:w-56">
         <div className="border-b border-ink-border px-2 py-4 text-center sm:px-4 sm:text-left">

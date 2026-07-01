@@ -1,8 +1,8 @@
 'use client';
 
 import { rollInitiative } from '@/app/combat-actions';
-import { getTerrain } from '@/lib/dnd';
 import { Panel, cn } from '@/app/crea/ui';
+import { SceneHeader } from './SceneHeader';
 import {
   currentCombatantId,
   hpBand,
@@ -37,13 +37,9 @@ export function CombatTracker({
   };
 
   return (
-    <Panel
-      title={`Combattimento · ${getTerrain(enc.terrain)?.name ?? ''} · Round ${enc.round}`}
-    >
-      {getTerrain(enc.terrain) && (
-        <p className="mb-3 text-xs text-parchment-dim">{getTerrain(enc.terrain)!.description}</p>
-      )}
-
+    <div className="space-y-3">
+      <SceneHeader terrainKey={enc.terrain} round={enc.round} encounter={enc.name} />
+      <Panel title="Iniziativa">
       {pc && pc.initiative == null && (
         <button
           type="button"
@@ -95,6 +91,7 @@ export function CombatTracker({
           );
         })}
       </ul>
-    </Panel>
+      </Panel>
+    </div>
   );
 }

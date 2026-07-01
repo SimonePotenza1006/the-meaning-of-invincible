@@ -16,7 +16,14 @@ import { ABILITY_LABELS, ABILITY_SHORT, SKILL_LABELS, skillLabel } from '@/lib/d
 import { abilityMod, initiativeMod, saveMod, skillMod } from '@/lib/character/derive-sheet';
 import { useCampaignState } from '@/lib/game/client';
 import { performDice, performRoll, type Adv } from '@/lib/game/roll';
-import { changeHp, savePlayerNotes, setDeathSaves, setTempHp, spendHitDie } from '@/app/game-actions';
+import {
+  changeHp,
+  savePlayerNotes,
+  setDeathSaves,
+  setTempHp,
+  spendHitDie,
+  spendInspiration,
+} from '@/app/game-actions';
 import { AdvToggle, HpBar, LogFeed, RollRow, RollTile, StatTile, Stepper } from '@/components/game';
 import { cn, Panel } from '@/app/crea/ui';
 import { SheetShell, type ShellSection } from '@/components/SheetShell';
@@ -155,6 +162,19 @@ export function PlayerSheet({ token, initial }: { token: string; initial: Campai
         <p className="mb-2 text-xs uppercase tracking-wide text-parchment-dim">Modalità di tiro</p>
         <AdvToggle value={adv} onChange={setAdv} />
       </div>
+
+      {sheet.inspiration && (
+        <div className="flex items-center justify-between gap-2 rounded-xl border border-gold/50 bg-burgundy/30 p-3">
+          <span className="text-sm text-gold">✦ Hai l’Ispirazione</span>
+          <button
+            type="button"
+            onClick={() => run(spendInspiration(token))}
+            className="rounded-lg border border-gold px-3 py-1.5 text-sm text-parchment transition-colors hover:bg-gold hover:text-[color:var(--color-ink)]"
+          >
+            Usa (vantaggio)
+          </button>
+        </div>
+      )}
 
       <Panel title="Stati e condizioni">
         {sheet.conditions.length === 0 ? (
@@ -332,6 +352,8 @@ export function PlayerSheet({ token, initial }: { token: string; initial: Campai
             requests={pendingOrdered}
             token={token}
             modFor={reqMod}
+            inspiration={sheet.inspiration}
+            onSpendInspiration={() => spendInspiration(token)}
             onRolled={refresh}
           />
         )

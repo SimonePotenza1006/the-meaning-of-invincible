@@ -18,7 +18,15 @@ import { ABILITY_LABELS, ABILITY_SHORT, CONDITIONS, SKILL_LABELS, skillLabel } f
 import { abilityMod, initiativeMod, saveMod, skillMod } from '@/lib/character/derive-sheet';
 import { useCampaignState } from '@/lib/game/client';
 import { performDice, performRoll, type Adv } from '@/lib/game/roll';
-import { changeHp, grantXp, levelUp, requestRoll, saveDmNotes, toggleCondition } from '@/app/game-actions';
+import {
+  changeHp,
+  grantXp,
+  levelUp,
+  requestRoll,
+  saveDmNotes,
+  setInspiration,
+  toggleCondition,
+} from '@/app/game-actions';
 import { AdvToggle, HpBar, LogFeed, RollRow, RollTile, StatTile, TokenBox } from '@/components/game';
 import { Chip, cn, Panel } from '@/app/crea/ui';
 import { SheetShell, type ShellSection } from '@/components/SheetShell';
@@ -99,6 +107,21 @@ export function DmDashboard({ token, initial }: { token: string; initial: Campai
             <span className="text-flag-red">{sheet.conditions.join(', ')}</span>
           </p>
         )}
+        <div className="mt-3 flex items-center justify-between gap-2 border-t border-ink-border/60 pt-3">
+          <span className="text-sm">
+            <span className="text-ochre">Ispirazione: </span>
+            <span className={sheet.inspiration ? 'text-gold' : 'text-parchment-dim'}>
+              {sheet.inspiration ? '✦ attiva' : 'assente'}
+            </span>
+          </span>
+          <button
+            type="button"
+            onClick={() => run(setInspiration(token, !sheet.inspiration))}
+            className="rounded-lg border border-gold/60 px-3 py-1.5 text-sm text-parchment hover:border-gold"
+          >
+            {sheet.inspiration ? 'Rimuovi' : 'Concedi ✦'}
+          </button>
+        </div>
       </Panel>
 
       <Panel title="Punti Ferita">
@@ -323,7 +346,7 @@ export function DmDashboard({ token, initial }: { token: string; initial: Campai
   // ── Section: Combattimento (encounter + PC attacks + enemy attack roller) ──
   const combattimento = (
     <>
-      <CombatPanel token={token} state={state} refresh={refresh} />
+      <CombatPanel token={token} state={state} refresh={refresh} adv={adv} secret={secret} />
       <AttacksPanel token={token} sheet={sheet} refresh={refresh} adv={adv} secret={secret} />
       <EnemyAttack token={token} adv={adv} secret={secret} run={run} />
     </>

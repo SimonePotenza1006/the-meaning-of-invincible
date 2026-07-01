@@ -179,6 +179,7 @@ export function buildSheet(state: WizardState): CharacterSheet {
       deathSaves: { successes: 0, failures: 0 },
     },
     conditions: [],
+    inspiration: false,
     attacks: [],
     spellcasting,
     features,

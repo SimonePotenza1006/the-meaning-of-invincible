@@ -23,24 +23,32 @@ export function RollRequestDialog({
   requests,
   token,
   modFor,
+  inspiration = false,
+  onSpendInspiration,
   onRolled,
 }: {
   requests: GameEvent[];
   token: string;
   modFor: (data: RequestData) => number;
+  inspiration?: boolean;
+  onSpendInspiration?: () => Promise<unknown>;
   onRolled: () => void;
 }) {
   const current = requests[0];
   const data = (current?.data ?? {}) as RequestData;
   const [adv, setAdv] = useState<Adv>(data.advantage ? 'advantage' : 'normal');
+  const [useInsp, setUseInsp] = useState(false);
   const [busy, setBusy] = useState(false);
 
   if (!current) return null;
 
+  const effectiveAdv: Adv = useInsp ? 'advantage' : adv;
+
   async function roll() {
     setBusy(true);
     try {
-      await performRoll(token, data.label ?? 'Tiro', modFor(data), adv, current.id);
+      await performRoll(token, data.label ?? 'Tiro', modFor(data), effectiveAdv, current.id);
+      if (useInsp && onSpendInspiration) await onSpendInspiration();
       onRolled();
     } finally {
       setBusy(false);
@@ -63,8 +71,21 @@ export function RollRequestDialog({
 
         <div className="mt-5">
           <p className="mb-2 text-xs uppercase tracking-wide text-parchment-dim">Modalità di tiro</p>
-          <AdvToggle value={adv} onChange={setAdv} />
+          <AdvToggle value={effectiveAdv} onChange={(v) => !useInsp && setAdv(v)} />
         </div>
+
+        {inspiration && (
+          <label className="mt-3 flex cursor-pointer items-center gap-2 rounded-lg border border-gold/50 bg-burgundy/30 px-3 py-2 text-sm text-parchment">
+            <input
+              type="checkbox"
+              checked={useInsp}
+              onChange={(e) => setUseInsp(e.target.checked)}
+            />
+            <span>
+              <span className="text-gold">✦ Usa Ispirazione</span> — tira con vantaggio
+            </span>
+          </label>
+        )}
 
         <button
           type="button"

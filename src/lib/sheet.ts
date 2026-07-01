@@ -172,6 +172,8 @@ export const characterSheetSchema = z.object({
   proficiencies: proficienciesSchema,
   combat: combatSchema,
   conditions: z.array(z.string()).default([]),
+  /** Heroic Inspiration: the DM grants it, the player spends it for advantage. */
+  inspiration: z.boolean().default(false),
   attacks: z.array(attackSchema).default([]),
   spellcasting: spellcastingSchema,
   features: z.array(featureSchema).default([]),
