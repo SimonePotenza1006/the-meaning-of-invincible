@@ -49,9 +49,16 @@ type MutationResult =
   | void;
 
 /** Load the character, apply a mutation to a cloned sheet, persist, log. */
-async function mutate(tok: string, apply: (sheet: CharacterSheet) => MutationResult) {
+async function mutate(
+  tok: string,
+  apply: (sheet: CharacterSheet) => MutationResult,
+  opts?: { dmOnly?: boolean },
+) {
   const found = await findByToken(tok);
   if (!found) throw new Error('Campagna non trovata.');
+  if (opts?.dmOnly && found.role !== 'dm') {
+    throw new Error('Solo il DM può gestire l’inventario.');
+  }
   const character = await currentCharacter(found.campaign.id);
   if (!character?.sheet) throw new Error('Nessun personaggio da modificare.');
 
@@ -320,71 +327,101 @@ export interface MagicItemInput {
   description?: string;
   rarity?: string;
   attunement?: boolean;
+  consumable?: boolean;
   charges?: { current: number; max: number };
   effects: MagicItemEffect[];
 }
 
+// ─── Inventory: only the DM adds/removes/equips items on the player's sheet ──
 export async function addMagicItem(tok: string, input: MagicItemInput) {
-  return mutate(tok, (s) => {
-    const item: MagicItem = {
-      id: crypto.randomUUID(),
-      name: input.name?.trim() || 'Oggetto magico',
-      description: input.description?.trim() || undefined,
-      rarity: input.rarity || undefined,
-      attunement: !!input.attunement,
-      equipped: true,
-      charges: input.charges && input.charges.max > 0 ? input.charges : undefined,
-      effects: input.effects ?? [],
-    };
-    s.equipment.magicItems.push(item);
-    applyItemStats(s, item, 1);
-    return { kind: 'item', actor: 'dm', message: `Nuovo oggetto magico: ${item.name}.` };
-  });
+  return mutate(
+    tok,
+    (s) => {
+      const item: MagicItem = {
+        id: crypto.randomUUID(),
+        name: input.name?.trim() || 'Oggetto magico',
+        description: input.description?.trim() || undefined,
+        rarity: input.rarity || undefined,
+        attunement: !!input.attunement,
+        consumable: !!input.consumable,
+        equipped: true,
+        charges: input.charges && input.charges.max > 0 ? input.charges : undefined,
+        effects: input.effects ?? [],
+      };
+      s.equipment.magicItems.push(item);
+      applyItemStats(s, item, 1);
+      return { kind: 'item', actor: 'dm', message: `Nuovo oggetto magico: ${item.name}.` };
+    },
+    { dmOnly: true },
+  );
 }
 
 export async function removeMagicItem(tok: string, id: string) {
+  return mutate(
+    tok,
+    (s) => {
+      const idx = s.equipment.magicItems.findIndex((i) => i.id === id);
+      if (idx < 0) return;
+      const item = s.equipment.magicItems[idx];
+      if (item.equipped) applyItemStats(s, item, -1);
+      s.equipment.magicItems.splice(idx, 1);
+      return { kind: 'item', message: `Oggetto rimosso: ${item.name}.` };
+    },
+    { dmOnly: true },
+  );
+}
+
+export async function setMagicItemEquipped(tok: string, id: string, equipped: boolean) {
+  return mutate(
+    tok,
+    (s) => {
+      const item = s.equipment.magicItems.find((i) => i.id === id);
+      if (!item || item.equipped === equipped) return;
+      item.equipped = equipped;
+      applyItemStats(s, item, equipped ? 1 : -1);
+      return { kind: 'item', message: `${item.name}: ${equipped ? 'equipaggiato' : 'riposto'}.` };
+    },
+    { dmOnly: true },
+  );
+}
+
+// Using an item is the one action the player may take. For a consumable the
+// charge count is its quantity: when it hits 0 the item is spent and removed.
+export async function useMagicItem(tok: string, id: string) {
   return mutate(tok, (s) => {
     const idx = s.equipment.magicItems.findIndex((i) => i.id === id);
     if (idx < 0) return;
     const item = s.equipment.magicItems[idx];
-    if (item.equipped) applyItemStats(s, item, -1);
-    s.equipment.magicItems.splice(idx, 1);
-    return { kind: 'item', message: `Oggetto rimosso: ${item.name}.` };
-  });
-}
-
-export async function setMagicItemEquipped(tok: string, id: string, equipped: boolean) {
-  return mutate(tok, (s) => {
-    const item = s.equipment.magicItems.find((i) => i.id === id);
-    if (!item || item.equipped === equipped) return;
-    item.equipped = equipped;
-    applyItemStats(s, item, equipped ? 1 : -1);
-    return { kind: 'item', message: `${item.name}: ${equipped ? 'equipaggiato' : 'riposto'}.` };
-  });
-}
-
-export async function useMagicItem(tok: string, id: string) {
-  return mutate(tok, (s) => {
-    const item = s.equipment.magicItems.find((i) => i.id === id);
-    if (!item) return;
     if (item.charges) {
-      if (item.charges.current <= 0) return { kind: 'item', message: `${item.name}: nessuna carica rimasta.` };
+      if (item.charges.current <= 0) return { kind: 'item', message: `${item.name}: esaurito.` };
       item.charges.current -= 1;
     }
     const spell = item.effects.find((e) => e.kind === 'spell');
     const what = spell?.spellName ? `lancia ${spell.spellName}` : 'utilizzato';
-    const chargeInfo = item.charges ? ` (${item.charges.current}/${item.charges.max} cariche)` : '';
-    return { kind: 'item', message: `${item.name}: ${what}.${chargeInfo}` };
+
+    if (item.consumable && item.charges && item.charges.current <= 0) {
+      if (item.equipped) applyItemStats(s, item, -1);
+      s.equipment.magicItems.splice(idx, 1);
+      return { kind: 'item', message: `${item.name}: ${what}. Ultimo utilizzo — esaurito.` };
+    }
+    const qtyInfo = item.charges
+      ? ` (${item.charges.current}/${item.charges.max}${item.consumable ? ' rimasti' : ' cariche'})`
+      : '';
+    return { kind: 'item', message: `${item.name}: ${what}.${qtyInfo}` };
   });
 }
 
 export async function rechargeMagicItem(tok: string, id: string) {
-  return mutate(tok, (s) => {
-    const item = s.equipment.magicItems.find((i) => i.id === id);
-    if (!item?.charges) return;
-    item.charges.current = item.charges.max;
-    return { kind: 'item', message: `${item.name}: cariche ripristinate (${item.charges.max}).` };
-  });
+  return mutate(
+    tok,
+    (s) => {
+      const item = s.equipment.magicItems.find((i) => i.id === id);
+      if (!item?.charges) return;
+      item.charges.current = item.charges.max;
+      return { kind: 'item', message: `${item.name}: cariche ripristinate (${item.charges.max}).` };
+    },
+    { dmOnly: true },
+  );
 }
 
 // ─── DM: instant level-up (player resolves the choices afterwards) ─────────

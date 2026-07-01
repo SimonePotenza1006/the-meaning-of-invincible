@@ -133,6 +133,8 @@ export const magicItemSchema = z.object({
   attunement: z.boolean().optional(),
   /** Stat bonuses only apply while equipped. */
   equipped: z.boolean().default(true),
+  /** Consumable: `charges` acts as a quantity and the item vanishes at 0 uses. */
+  consumable: z.boolean().default(false),
   charges: z.object({ current: z.number().int().min(0), max: z.number().int().min(0) }).optional(),
   effects: z.array(magicItemEffectSchema).default([]),
 });

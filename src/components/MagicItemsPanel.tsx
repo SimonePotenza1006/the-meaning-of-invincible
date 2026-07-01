@@ -116,10 +116,17 @@ function ItemCard({
             <p className="mt-0.5 text-xs text-parchment-dim">{item.description}</p>
           )}
         </div>
-        <label className="flex shrink-0 items-center gap-1 text-xs text-parchment-dim">
-          <input type="checkbox" checked={item.equipped} onChange={(e) => onEquip(e.target.checked)} />
-          Eq.
-        </label>
+        {canCreate ? (
+          <label className="flex shrink-0 items-center gap-1 text-xs text-parchment-dim">
+            <input type="checkbox" checked={item.equipped} onChange={(e) => onEquip(e.target.checked)} />
+            Eq.
+          </label>
+        ) : (
+          item.equipped &&
+          item.effects.length > 0 && (
+            <span className="shrink-0 text-xs text-gold">equipaggiato</span>
+          )
+        )}
       </div>
 
       {item.effects.length > 0 && (
@@ -147,7 +154,7 @@ function ItemCard({
         <div className="mt-2 flex flex-wrap items-center gap-2">
           {item.charges && (
             <span className="text-xs text-parchment-dim">
-              Cariche {item.charges.current}/{item.charges.max}
+              {item.consumable ? 'Quantità' : 'Cariche'} {item.charges.current}/{item.charges.max}
             </span>
           )}
           {canUse && (
@@ -194,6 +201,7 @@ function ItemBuilder({
   const [description, setDescription] = useState('');
   const [rarity, setRarity] = useState('Non comune');
   const [attunement, setAttunement] = useState(false);
+  const [consumable, setConsumable] = useState(false);
   const [chargesMax, setChargesMax] = useState('');
   const [effects, setEffects] = useState<MagicItemEffect[]>([]);
 
@@ -217,6 +225,7 @@ function ItemBuilder({
       description,
       rarity,
       attunement,
+      consumable,
       charges: Number.isFinite(max) && max > 0 ? { current: max, max } : undefined,
       effects,
     });
@@ -244,12 +253,16 @@ function ItemBuilder({
           <input type="checkbox" checked={attunement} onChange={(e) => setAttunement(e.target.checked)} />
           Sintonia
         </label>
+        <label className="flex items-center gap-1.5 text-sm text-parchment">
+          <input type="checkbox" checked={consumable} onChange={(e) => setConsumable(e.target.checked)} />
+          Consumabile
+        </label>
         <input
-          className={cn(inputClass, 'w-28')}
+          className={cn(inputClass, 'w-32')}
           value={chargesMax}
           onChange={(e) => setChargesMax(e.target.value.replace(/[^0-9]/g, ''))}
           inputMode="numeric"
-          placeholder="Cariche max"
+          placeholder={consumable ? 'Quantità' : 'Cariche max'}
         />
       </div>
 

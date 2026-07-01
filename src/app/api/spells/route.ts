@@ -15,5 +15,7 @@ export async function GET(req: Request) {
   const query = url.searchParams.get('q') ?? undefined;
   const levelRaw = url.searchParams.get('level');
   const level = levelRaw != null && levelRaw !== '' ? Number(levelRaw) : undefined;
-  return Response.json(searchSpells({ classKey, level, query }));
+  const maxLevelRaw = url.searchParams.get('maxLevel');
+  const maxLevel = maxLevelRaw != null && maxLevelRaw !== '' ? Number(maxLevelRaw) : undefined;
+  return Response.json(searchSpells({ classKey, level, maxLevel, query }));
 }

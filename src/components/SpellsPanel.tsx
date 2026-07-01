@@ -66,6 +66,10 @@ export function SpellsPanel({
   const knownSorted = [...sc.known].sort((a, b) => a.level - b.level || a.name.localeCompare(b.name, 'it'));
   const knownCount = isPrepared ? preparedSet.size : sc.known.length;
 
+  // Highest spell level the character can actually cast (from its slots). A
+  // caster can't browse/learn spells above this — only up to it, plus cantrips.
+  const maxSpellLevel = sc.slots.reduce((m, s) => Math.max(m, s.level), 0);
+
   return (
     <Panel title="Incantesimi">
       <div className="grid grid-cols-2 gap-2">
@@ -151,6 +155,7 @@ export function SpellsPanel({
       {manage && (
         <SpellBrowser
           classKey={classKey}
+          maxSpellLevel={maxSpellLevel}
           learnedSet={learnedSet}
           onLearn={(sp) => run(learnSpell(token, sp))}
           onForget={(index) => run(forgetSpell(token, index))}
@@ -215,11 +220,13 @@ function SpellRow({
 
 function SpellBrowser({
   classKey,
+  maxSpellLevel,
   learnedSet,
   onLearn,
   onForget,
 }: {
   classKey: string;
+  maxSpellLevel: number;
   learnedSet: Set<string>;
   onLearn: (spell: { index: string; name: string; level: number }) => void;
   onForget: (index: string) => void;
@@ -231,11 +238,16 @@ function SpellBrowser({
   const [open, setOpen] = useState<string | null>(null);
   const [details, setDetails] = useState<Record<string, SpellDetail>>({});
 
+  // Only offer the levels this caster can reach (cantrips + up to its max).
+  const selectableLevels = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter((l) => l <= maxSpellLevel);
+
   useEffect(() => {
     let active = true;
     setLoading(true);
     const params = new URLSearchParams({ class: classKey });
     if (level !== '') params.set('level', level);
+    // Cap results at the caster's max level (matters for the "all levels" view).
+    params.set('maxLevel', String(maxSpellLevel));
     if (q.trim()) params.set('q', q.trim());
     fetch(`/api/spells?${params.toString()}`)
       .then((r) => r.json())
@@ -249,7 +261,7 @@ function SpellBrowser({
     return () => {
       active = false;
     };
-  }, [classKey, level, q]);
+  }, [classKey, level, q, maxSpellLevel]);
 
   async function toggleDetail(index: string) {
     setOpen((o) => (o === index ? null : index));
@@ -268,7 +280,7 @@ function SpellBrowser({
         <select value={level} onChange={(e) => setLevel(e.target.value)} className={selectClass}>
           <option value="">Tutti i livelli</option>
           <option value="0">Trucchetti</option>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((l) => (
+          {selectableLevels.map((l) => (
             <option key={l} value={String(l)}>
               Livello {l}
             </option>

@@ -2,10 +2,15 @@
 
 import { useState } from 'react';
 import { ABILITIES, type Ability } from '@/lib/rules';
-import { ABILITY_LABELS, getSubclasses, subclassMeta } from '@/lib/dnd';
+import {
+  ABILITY_LABELS,
+  classFeaturesAt,
+  getSubclasses,
+  subclassFeaturesAt,
+  subclassMeta,
+} from '@/lib/dnd';
 import { resolveClassKey } from '@/lib/character/levelup';
 import {
-  addLevelUpFeature,
   applyLevelUpAsi,
   chooseLevelUpSubclass,
   finishLevelUp,
@@ -41,6 +46,15 @@ export function LevelUpPanel({
   const classKey = resolveClassKey(sheet);
   const meta = subclassMeta(classKey);
   const subclasses = getSubclasses(classKey);
+
+  // Features the engine already granted for this level (base class + subclass if
+  // one is chosen). Shown read-only so nothing has to be written by hand.
+  const grantedFeatures = [
+    ...classFeaturesAt(classKey, p.level),
+    ...(sheet.identity.subclassKey
+      ? subclassFeaturesAt(classKey, sheet.identity.subclassKey, p.level)
+      : []),
+  ];
 
   return (
     <section className="rounded-xl border-2 border-gold bg-burgundy/40 p-4 shadow-[0_10px_30px_-14px_var(--color-gold)]">
@@ -114,8 +128,31 @@ export function LevelUpPanel({
         {/* Ability Score Improvement */}
         {p.needsAsi && <AsiPicker sheet={sheet} busy={busy} onApply={(picks) => run(() => applyLevelUpAsi(token, picks))} />}
 
-        {/* Free-form feature */}
-        <ManualFeature busy={busy} onAdd={(name, desc) => run(() => addLevelUpFeature(token, name, desc))} />
+        {/* Features granted automatically at this level (read-only) */}
+        {grantedFeatures.length > 0 && (
+          <div className="rounded-lg border border-ink-border bg-ink-raised/70 p-3">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.15em] text-ochre">
+              Privilegi ottenuti · aggiunti in automatico
+            </p>
+            <ul className="space-y-2">
+              {grantedFeatures.map((f, i) => (
+                <li key={`${f.name}-${i}`}>
+                  <span className="flex items-baseline gap-1.5">
+                    <span className="text-gold" aria-hidden>
+                      ✦
+                    </span>
+                    <span className="font-display text-sm text-parchment">{f.name}</span>
+                  </span>
+                  {f.description && (
+                    <p className="mt-0.5 pl-5 text-xs leading-snug text-parchment-dim">
+                      {f.description}
+                    </p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <button
           type="button"
@@ -228,72 +265,3 @@ function AsiPicker({
   );
 }
 
-function ManualFeature({
-  busy,
-  onAdd,
-}: {
-  busy: boolean;
-  onAdd: (name: string, desc: string) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const [name, setName] = useState('');
-  const [desc, setDesc] = useState('');
-  const inputClass =
-    'w-full rounded-md border border-ink-border bg-[color:var(--color-ink)] px-2.5 py-2 text-sm text-parchment placeholder:text-parchment-dim/60 focus:border-gold focus:outline-none';
-
-  if (!open) {
-    return (
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="w-full rounded-md border border-dashed border-ink-border px-3 py-2 text-sm text-parchment-dim hover:border-ochre hover:text-parchment"
-      >
-        + Aggiungi un privilegio o tratto a mano
-      </button>
-    );
-  }
-  return (
-    <div className="space-y-2 rounded-lg border border-ink-border bg-ink-raised/70 p-3">
-      <input
-        className={inputClass}
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Nome del privilegio"
-        maxLength={80}
-      />
-      <textarea
-        className={cn(inputClass, 'min-h-16 resize-y')}
-        value={desc}
-        onChange={(e) => setDesc(e.target.value)}
-        placeholder="Descrizione (facoltativa)"
-        maxLength={400}
-      />
-      <div className="flex gap-2">
-        <button
-          type="button"
-          onClick={() => {
-            setOpen(false);
-            setName('');
-            setDesc('');
-          }}
-          className="rounded-md border border-ink-border px-3 py-1.5 text-sm text-parchment-dim hover:border-ochre"
-        >
-          Annulla
-        </button>
-        <button
-          type="button"
-          disabled={busy || !name.trim()}
-          onClick={() => {
-            onAdd(name, desc);
-            setOpen(false);
-            setName('');
-            setDesc('');
-          }}
-          className="flex-1 rounded-md bg-gold px-3 py-1.5 text-sm font-medium text-[color:var(--color-ink)] hover:brightness-110 disabled:opacity-50"
-        >
-          Aggiungi
-        </button>
-      </div>
-    </div>
-  );
-}

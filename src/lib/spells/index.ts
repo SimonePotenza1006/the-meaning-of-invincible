@@ -68,11 +68,14 @@ function toItem(s: RawSpell): SpellListItem {
 export function searchSpells(opts: {
   classKey?: string;
   level?: number;
+  /** Cap: hide spells above this level (a caster can't learn what it can't cast). */
+  maxLevel?: number;
   query?: string;
 }): SpellListItem[] {
   let list = SPELLS;
   if (opts.classKey) list = list.filter((s) => s.classes.includes(opts.classKey!));
   if (opts.level != null) list = list.filter((s) => s.level === opts.level);
+  if (opts.maxLevel != null) list = list.filter((s) => s.level <= opts.maxLevel!);
   if (opts.query) {
     const q = opts.query.toLowerCase();
     list = list.filter((s) => itName(s).toLowerCase().includes(q) || s.name.toLowerCase().includes(q));
