@@ -14,7 +14,8 @@ export const INTRO_SEEN_KEY = 'tmoi:intro-seen';
 export interface IntroSlide {
   /** Small eyebrow label above the title (optional). */
   eyebrow?: string;
-  title: string;
+  /** Optional heading — omit for a pure block of prose. */
+  title?: string;
   /** One or more paragraphs of body prose. */
   body: string[];
 }

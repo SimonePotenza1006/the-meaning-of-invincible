@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { loadState } from '@/lib/game/repo';
 import { saveCharacterForCampaign } from '@/app/game-actions';
-import { PlayJoin } from './PlayJoin';
+import { PlayerOnboarding } from '../PlayerOnboarding';
 import { PlayerSheet } from './PlayerSheet';
 
 export const dynamic = 'force-dynamic';
@@ -20,7 +20,7 @@ export default async function PlayPage({
     state.character && state.character.status === 'active' && state.character.sheet;
 
   if (!active) {
-    return <PlayJoin save={saveCharacterForCampaign.bind(null, playerToken)} />;
+    return <PlayerOnboarding save={saveCharacterForCampaign.bind(null, playerToken)} />;
   }
   return <PlayerSheet token={playerToken} initial={state} />;
 }

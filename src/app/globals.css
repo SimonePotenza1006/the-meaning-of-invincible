@@ -52,6 +52,25 @@ body {
   background: color-mix(in srgb, var(--color-gold) 38%, transparent);
 }
 
+/* ─── Intro presentation: slow, low-key "psychedelic" drift ─── */
+@keyframes intro-blob-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(9%, 7%) scale(1.18); }
+}
+@keyframes intro-blob-b {
+  0%, 100% { transform: translate(0, 0) scale(1.1); }
+  50% { transform: translate(-11%, -9%) scale(0.92); }
+}
+@keyframes intro-blob-c {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(7%, -12%) scale(1.22); }
+}
+/* Very slow hue drift over the whole field — subtle, keeps text readable. */
+@keyframes intro-hue {
+  from { filter: hue-rotate(0deg); }
+  to { filter: hue-rotate(360deg); }
+}
+
 /* Accessibility floor: honour reduced-motion preferences. */
 @media (prefers-reduced-motion: reduce) {
   *,
