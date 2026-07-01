@@ -2,9 +2,12 @@
 
 import { useState } from 'react';
 import {
+  GiBattleGear,
   GiCrossedSwords,
   GiDiceTwentyFacesTwenty,
   GiHearts,
+  GiNotebook,
+  GiScrollUnfurled,
   GiSpellBook,
   GiSwapBag,
 } from 'react-icons/gi';
@@ -13,7 +16,7 @@ import { ABILITY_LABELS, ABILITY_SHORT, SKILL_LABELS, skillLabel } from '@/lib/d
 import { abilityMod, initiativeMod, saveMod, skillMod } from '@/lib/character/derive-sheet';
 import { useCampaignState } from '@/lib/game/client';
 import { performDice, performRoll, type Adv } from '@/lib/game/roll';
-import { changeHp, setDeathSaves, setTempHp, spendHitDie } from '@/app/game-actions';
+import { changeHp, savePlayerNotes, setDeathSaves, setTempHp, spendHitDie } from '@/app/game-actions';
 import { AdvToggle, HpBar, LogFeed, RollRow, RollTile, StatTile, Stepper } from '@/components/game';
 import { cn, Panel } from '@/app/crea/ui';
 import { SheetShell, type ShellSection } from '@/components/SheetShell';
@@ -22,6 +25,7 @@ import { LevelUpPanel } from '@/components/LevelUpPanel';
 import { AttacksPanel } from '@/components/AttacksPanel';
 import { SpellsPanel } from '@/components/SpellsPanel';
 import { MagicItemsPanel } from '@/components/MagicItemsPanel';
+import { NotesPanel } from '@/components/NotesPanel';
 import type { CampaignState } from '@/lib/game/repo';
 
 const DICE = ['d20', 'd12', 'd10', 'd8', 'd6', 'd4'];
@@ -74,11 +78,9 @@ export function PlayerSheet({ token, initial }: { token: string; initial: Campai
     return 0;
   }
 
-  // ── Section: Vitali (identity, HP, combat, conditions, dice) ──
+  // ── Section: Vitali (HP, conditions, dice) ──
   const vitali = (
     <>
-      <CombatTracker token={token} state={state} refresh={refresh} />
-
       <Panel title="Punti Ferita">
         <HpBar current={sheet.combat.currentHp} max={sheet.combat.maxHp} temp={sheet.combat.tempHp} />
         <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -236,8 +238,50 @@ export function PlayerSheet({ token, initial }: { token: string; initial: Campai
     </>
   );
 
+  const combattimento = (
+    <>
+      <CombatTracker token={token} state={state} refresh={refresh} />
+      <AttacksPanel token={token} sheet={sheet} refresh={refresh} adv={adv} />
+      <Panel title="Dadi">
+        <div className="flex flex-wrap gap-2">
+          {DICE.map((d) => (
+            <button
+              key={d}
+              type="button"
+              onClick={() => run(performDice(token, d))}
+              className="rounded-md border border-ink-border px-3 py-1.5 text-sm text-parchment hover:border-gold"
+            >
+              {d}
+            </button>
+          ))}
+        </div>
+      </Panel>
+    </>
+  );
+
+  const privilegi = (
+    <Panel title={`Privilegi e tratti (${sheet.features.length})`}>
+      {sheet.features.length === 0 ? (
+        <p className="text-sm text-parchment-dim">Ancora nessun privilegio.</p>
+      ) : (
+        <ul className="space-y-2">
+          {sheet.features.map((f, i) => (
+            <li key={`${f.source}-${f.name}-${i}`} className="text-sm">
+              <span className="font-medium text-parchment">{f.name}</span>{' '}
+              <span className="text-xs text-ochre">· {f.source}</span>
+              {f.description && (
+                <span className="mt-0.5 block text-parchment-dim">{f.description}</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </Panel>
+  );
+
   const sections: ShellSection[] = [
     { id: 'vitali', label: 'Vitali', icon: <GiHearts />, content: vitali },
+    { id: 'combattimento', label: 'Combattimento', icon: <GiBattleGear />, content: combattimento },
     {
       id: 'attacchi',
       label: 'Attacchi',
@@ -252,11 +296,23 @@ export function PlayerSheet({ token, initial }: { token: string; initial: Campai
       hidden: !sheet.spellcasting,
       content: <SpellsPanel token={token} sheet={sheet} refresh={refresh} />,
     },
+    { id: 'privilegi', label: 'Privilegi', icon: <GiScrollUnfurled />, content: privilegi },
     {
       id: 'oggetti',
       label: 'Oggetti',
       icon: <GiSwapBag />,
       content: <MagicItemsPanel token={token} sheet={sheet} refresh={refresh} />,
+    },
+    {
+      id: 'note',
+      label: 'Note',
+      icon: <GiNotebook />,
+      content: (
+        <NotesPanel
+          initial={sheet.notes ?? ''}
+          save={(text) => run(savePlayerNotes(token, text))}
+        />
+      ),
     },
   ];
 

@@ -13,6 +13,7 @@ import {
 } from '@/lib/character/levelup';
 import { getWeapon, weaponName } from '@/lib/combat/weapons';
 import { spellActionCost } from '@/lib/spells';
+import { buildNpc, type NpcInput } from '@/lib/character/npc';
 import { applyItemStats } from '@/lib/character/items';
 import type { MagicItem, MagicItemEffect } from '@/lib/sheet';
 import type { SaveResult } from '@/lib/game/types';
@@ -562,16 +563,18 @@ export async function requestRoll(
 // ─── Either side: record a dice roll (rolled client-side via the rules engine) ─
 export async function recordRoll(
   tok: string,
-  payload: { label: string; detail: string; total: number; requestId?: number },
+  payload: { label: string; detail: string; total: number; requestId?: number; secret?: boolean },
 ) {
   const found = await findByToken(tok);
   if (!found) throw new Error('Campagna non trovata.');
+  // A secret roll is only ever the DM's; the player's log filters it out.
+  const secret = !!payload.secret && found.role === 'dm';
   await db.insert(events).values({
     campaignId: found.campaign.id,
     actor: found.role,
     kind: 'roll',
     message: `${payload.label}: ${payload.detail} = ${payload.total}`,
-    data: payload,
+    data: { ...payload, secret },
   });
   return { ok: true };
 }
@@ -587,5 +590,82 @@ export async function addNote(tok: string, text: string) {
     kind: 'note',
     message: clean,
   });
+  return { ok: true };
+}
+
+// ─── Persistent notepads (not log entries) ────────────────────────────────
+/** Player's private notepad, stored on the sheet. */
+export async function savePlayerNotes(tok: string, text: string) {
+  return mutate(tok, (s) => {
+    s.notes = text.slice(0, 20000);
+    return undefined; // silent save — no log spam
+  });
+}
+
+/** DM's private notepad, stored on the campaign row. */
+export async function saveDmNotes(dmToken: string, text: string) {
+  const found = await findByToken(dmToken);
+  if (!found) throw new Error('Campagna non trovata.');
+  if (found.role !== 'dm') throw new Error('Solo il DM può salvare queste note.');
+  await db
+    .update(campaigns)
+    .set({ dmNotes: text.slice(0, 40000) })
+    .where(eq(campaigns.id, found.campaign.id));
+  return { ok: true };
+}
+
+// ─── NPC roster (DM-only, stored on the campaign row) ─────────────────────
+async function requireDm(dmToken: string) {
+  const found = await findByToken(dmToken);
+  if (!found) throw new Error('Campagna non trovata.');
+  if (found.role !== 'dm') throw new Error('Solo il DM può gestire gli NPC.');
+  return found;
+}
+
+export async function addNpc(dmToken: string, input: NpcInput) {
+  const found = await requireDm(dmToken);
+  const npc = buildNpc(input);
+  const npcs = [...(found.campaign.npcs ?? []), npc];
+  await db.update(campaigns).set({ npcs }).where(eq(campaigns.id, found.campaign.id));
+  return { ok: true };
+}
+
+export async function updateNpc(dmToken: string, id: string, input: NpcInput) {
+  const found = await requireDm(dmToken);
+  const list = found.campaign.npcs ?? [];
+  const prev = list.find((n) => n.id === id);
+  if (!prev) throw new Error('NPC non trovato.');
+  const rebuilt = buildNpc(input, { id, currentHp: prev.currentHp, notes: prev.notes });
+  const npcs = list.map((n) => (n.id === id ? rebuilt : n));
+  await db.update(campaigns).set({ npcs }).where(eq(campaigns.id, found.campaign.id));
+  return { ok: true };
+}
+
+/** Adjust an NPC's current HP (and, optionally, its notes) without a full rebuild. */
+export async function patchNpc(
+  dmToken: string,
+  id: string,
+  patch: { currentHp?: number; notes?: string },
+) {
+  const found = await requireDm(dmToken);
+  const list = found.campaign.npcs ?? [];
+  const npcs = list.map((n) =>
+    n.id === id
+      ? {
+          ...n,
+          currentHp:
+            patch.currentHp != null ? Math.max(0, Math.min(patch.currentHp, n.maxHp)) : n.currentHp,
+          notes: patch.notes != null ? patch.notes.trim() || undefined : n.notes,
+        }
+      : n,
+  );
+  await db.update(campaigns).set({ npcs }).where(eq(campaigns.id, found.campaign.id));
+  return { ok: true };
+}
+
+export async function removeNpc(dmToken: string, id: string) {
+  const found = await requireDm(dmToken);
+  const npcs = (found.campaign.npcs ?? []).filter((n) => n.id !== id);
+  await db.update(campaigns).set({ npcs }).where(eq(campaigns.id, found.campaign.id));
   return { ok: true };
 }

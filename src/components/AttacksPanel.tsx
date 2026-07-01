@@ -13,11 +13,14 @@ export function AttacksPanel({
   sheet,
   refresh,
   adv = 'normal',
+  secret = false,
 }: {
   token: string;
   sheet: CharacterSheet;
   refresh: () => void;
   adv?: Adv;
+  /** When true (DM side), the to-hit/damage rolls are hidden from the player. */
+  secret?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const run = async (p: Promise<unknown>) => {
@@ -58,7 +61,9 @@ export function AttacksPanel({
               <div className="flex shrink-0 items-center gap-1.5">
                 <button
                   type="button"
-                  onClick={() => run(performRoll(token, `${r.label} (attacco)`, r.attackMod, adv))}
+                  onClick={() =>
+                    run(performRoll(token, `${r.label} (attacco)`, r.attackMod, adv, undefined, secret))
+                  }
                   className="rounded-md border border-gold/60 px-2.5 py-1 text-sm font-medium text-parchment hover:border-gold"
                 >
                   {r.attackLabel}
@@ -66,7 +71,7 @@ export function AttacksPanel({
                 {r.damage && (
                   <button
                     type="button"
-                    onClick={() => run(performDice(token, r.damage))}
+                    onClick={() => run(performDice(token, r.damage, secret))}
                     className="rounded-md border border-ochre/60 px-2.5 py-1 text-sm text-parchment hover:border-ochre"
                   >
                     Danni

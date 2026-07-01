@@ -37,12 +37,17 @@ export async function loadState(tok: string): Promise<CampaignState | null> {
     .orderBy(desc(characters.id))
     .limit(1);
 
-  const log = await db
+  const rawLog = await db
     .select()
     .from(events)
     .where(eq(events.campaignId, campaign.id))
     .orderBy(desc(events.createdAt))
     .limit(60);
+  // Secret rolls are the DM's alone — never surface them to the player.
+  const log =
+    role === 'player'
+      ? rawLog.filter((e) => !(e.data as { secret?: boolean } | null)?.secret)
+      : rawLog;
 
   // Most recent encounter that hasn't ended (draft while building, active in combat).
   const [encounter] = await db

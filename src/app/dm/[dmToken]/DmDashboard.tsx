@@ -6,24 +6,28 @@ import {
   GiCog,
   GiCrossedSwords,
   GiDiceTwentyFacesTwenty,
+  GiNotebook,
   GiScrollUnfurled,
   GiSkullCrossedBones,
   GiSpellBook,
   GiSwapBag,
+  GiThreeFriends,
 } from 'react-icons/gi';
 import { ABILITIES, formatMod } from '@/lib/rules';
 import { ABILITY_LABELS, ABILITY_SHORT, CONDITIONS, SKILL_LABELS, skillLabel } from '@/lib/dnd';
 import { abilityMod, initiativeMod, saveMod, skillMod } from '@/lib/character/derive-sheet';
 import { useCampaignState } from '@/lib/game/client';
 import { performDice, performRoll, type Adv } from '@/lib/game/roll';
-import { changeHp, grantXp, levelUp, requestRoll, toggleCondition } from '@/app/game-actions';
+import { changeHp, grantXp, levelUp, requestRoll, saveDmNotes, toggleCondition } from '@/app/game-actions';
 import { AdvToggle, HpBar, LogFeed, RollRow, RollTile, StatTile, TokenBox } from '@/components/game';
-import { Chip, Panel } from '@/app/crea/ui';
+import { Chip, cn, Panel } from '@/app/crea/ui';
 import { SheetShell, type ShellSection } from '@/components/SheetShell';
 import { CombatPanel } from '@/components/combat/CombatPanel';
 import { AttacksPanel } from '@/components/AttacksPanel';
 import { SpellsPanel } from '@/components/SpellsPanel';
 import { MagicItemsPanel } from '@/components/MagicItemsPanel';
+import { NotesPanel } from '@/components/NotesPanel';
+import { NpcPanel } from '@/components/NpcPanel';
 import type { CampaignState } from '@/lib/game/repo';
 
 const DICE = ['d20', 'd12', 'd10', 'd8', 'd6', 'd4'];
@@ -34,6 +38,8 @@ const SKILL_KEYS = Object.keys(SKILL_LABELS).sort((a, b) =>
 export function DmDashboard({ token, initial }: { token: string; initial: CampaignState }) {
   const { state, refresh } = useCampaignState(token, initial);
   const [adv, setAdv] = useState<Adv>('normal');
+  // When on, the DM's rolls are hidden from the player's log.
+  const [secret, setSecret] = useState(false);
 
   const run = async (p: Promise<unknown>) => {
     try {
@@ -118,7 +124,9 @@ export function DmDashboard({ token, initial }: { token: string; initial: Campai
         <StatTile label="Comp." value={formatMod(sheet.proficiencies.proficiencyBonus)} />
         <button
           type="button"
-          onClick={() => run(performRoll(token, 'Iniziativa (DM)', initiativeMod(sheet), adv))}
+          onClick={() =>
+            run(performRoll(token, 'Iniziativa (DM)', initiativeMod(sheet), adv, undefined, secret))
+          }
         >
           <StatTile label="Iniz. ▶" value={formatMod(initiativeMod(sheet))} />
         </button>
@@ -150,7 +158,9 @@ export function DmDashboard({ token, initial }: { token: string; initial: Campai
               score={sheet.abilities[a]}
               mod={abilityMod(sheet, a)}
               onClick={() =>
-                run(performRoll(token, `${ABILITY_LABELS[a]} (DM)`, abilityMod(sheet, a), adv))
+                run(
+                  performRoll(token, `${ABILITY_LABELS[a]} (DM)`, abilityMod(sheet, a), adv, undefined, secret),
+                )
               }
             />
           ))}
@@ -166,7 +176,9 @@ export function DmDashboard({ token, initial }: { token: string; initial: Campai
               mod={saveMod(sheet, a)}
               highlight={sheet.proficiencies.savingThrows.includes(a)}
               onClick={() =>
-                run(performRoll(token, `TS ${ABILITY_LABELS[a]} (DM)`, saveMod(sheet, a), adv))
+                run(
+                  performRoll(token, `TS ${ABILITY_LABELS[a]} (DM)`, saveMod(sheet, a), adv, undefined, secret),
+                )
               }
             />
           ))}
@@ -181,7 +193,9 @@ export function DmDashboard({ token, initial }: { token: string; initial: Campai
               label={skillLabel(s)}
               mod={skillMod(sheet, s)}
               highlight={sheet.proficiencies.skills.includes(s)}
-              onClick={() => run(performRoll(token, `${skillLabel(s)} (DM)`, skillMod(sheet, s), adv))}
+              onClick={() =>
+                run(performRoll(token, `${skillLabel(s)} (DM)`, skillMod(sheet, s), adv, undefined, secret))
+              }
             />
           ))}
         </div>
@@ -215,6 +229,37 @@ export function DmDashboard({ token, initial }: { token: string; initial: Campai
         <AdvToggle value={adv} onChange={setAdv} />
         <p className="mt-2 text-xs text-parchment-dim">
           Vale per i tiri del DM e per le richieste al giocatore.
+        </p>
+      </Panel>
+
+      <Panel title="Tiri segreti">
+        <button
+          type="button"
+          onClick={() => setSecret((v) => !v)}
+          aria-pressed={secret}
+          className={cn(
+            'flex w-full items-center justify-between rounded-lg border px-3 py-2.5 text-sm transition-colors',
+            secret ? 'border-gold bg-burgundy/40 text-parchment' : 'border-ink-border text-parchment-dim hover:border-ochre',
+          )}
+        >
+          <span>{secret ? '🙈 Tiri nascosti al giocatore' : '👁 Tiri visibili al giocatore'}</span>
+          <span
+            className={cn(
+              'ml-2 inline-flex h-5 w-9 items-center rounded-full p-0.5 transition-colors',
+              secret ? 'bg-gold' : 'bg-ink-border',
+            )}
+          >
+            <span
+              className={cn(
+                'h-4 w-4 rounded-full bg-[color:var(--color-ink)] transition-transform',
+                secret ? 'translate-x-4' : 'translate-x-0',
+              )}
+            />
+          </span>
+        </button>
+        <p className="mt-2 text-xs text-parchment-dim">
+          Quando è attivo, i risultati dei tuoi tiri (prove, attacchi, dadi) non compaiono nella
+          cronaca del giocatore.
         </p>
       </Panel>
 
@@ -264,7 +309,7 @@ export function DmDashboard({ token, initial }: { token: string; initial: Campai
             <button
               key={d}
               type="button"
-              onClick={() => run(performDice(token, d))}
+              onClick={() => run(performDice(token, d, secret))}
               className="rounded-md border border-ink-border px-3 py-1.5 text-sm text-parchment hover:border-gold"
             >
               {d}
@@ -275,19 +320,23 @@ export function DmDashboard({ token, initial }: { token: string; initial: Campai
     </>
   );
 
+  // ── Section: Combattimento (encounter + PC attacks + enemy attack roller) ──
+  const combattimento = (
+    <>
+      <CombatPanel token={token} state={state} refresh={refresh} />
+      <AttacksPanel token={token} sheet={sheet} refresh={refresh} adv={adv} secret={secret} />
+      <EnemyAttack token={token} adv={adv} secret={secret} run={run} />
+    </>
+  );
+
   const sections: ShellSection[] = [
     { id: 'personaggio', label: 'Personaggio', icon: <GiScrollUnfurled />, content: personaggio },
-    {
-      id: 'combattimento',
-      label: 'Combattimento',
-      icon: <GiBattleGear />,
-      content: <CombatPanel token={token} state={state} refresh={refresh} />,
-    },
+    { id: 'combattimento', label: 'Combattimento', icon: <GiBattleGear />, content: combattimento },
     {
       id: 'attacchi',
       label: 'Attacchi',
       icon: <GiCrossedSwords />,
-      content: <AttacksPanel token={token} sheet={sheet} refresh={refresh} adv={adv} />,
+      content: <AttacksPanel token={token} sheet={sheet} refresh={refresh} adv={adv} secret={secret} />,
     },
     { id: 'prove', label: 'Prove', icon: <GiDiceTwentyFacesTwenty />, content: prove },
     {
@@ -304,6 +353,25 @@ export function DmDashboard({ token, initial }: { token: string; initial: Campai
       content: <MagicItemsPanel token={token} sheet={sheet} refresh={refresh} canCreate />,
     },
     { id: 'stati', label: 'Stati', icon: <GiSkullCrossedBones />, content: stati },
+    {
+      id: 'npc',
+      label: 'NPC',
+      icon: <GiThreeFriends />,
+      content: <NpcPanel token={token} npcs={state.campaign.npcs ?? []} refresh={refresh} />,
+    },
+    {
+      id: 'note',
+      label: 'Note',
+      icon: <GiNotebook />,
+      content: (
+        <NotesPanel
+          title="Note del Master"
+          initial={state.campaign.dmNotes ?? ''}
+          save={(text) => saveDmNotes(token, text)}
+          placeholder="Trama, segreti, ganci, promemoria di sessione…"
+        />
+      ),
+    },
     { id: 'strumenti', label: 'Strumenti', icon: <GiCog />, content: strumenti },
   ];
 
@@ -365,6 +433,74 @@ function HpAmount({
         Cura
       </button>
     </div>
+  );
+}
+
+function EnemyAttack({
+  token,
+  adv,
+  secret,
+  run,
+}: {
+  token: string;
+  adv: Adv;
+  secret: boolean;
+  run: (p: Promise<unknown>) => Promise<void>;
+}) {
+  const [name, setName] = useState('');
+  const [mod, setMod] = useState('');
+  const [dmg, setDmg] = useState('');
+  const field =
+    'rounded-lg border border-ink-border bg-[color:var(--color-ink)] px-3 py-2 text-sm text-parchment placeholder:text-parchment-dim/60 focus:border-gold focus:outline-none';
+  const label = name.trim() ? `${name.trim()} (nemico)` : 'Nemico';
+  const m = parseInt(mod, 10) || 0;
+
+  return (
+    <Panel title="Attacco nemico">
+      <p className="mb-2 text-xs text-parchment-dim">
+        Tira per colpire e per i danni di un nemico.
+        {secret ? ' I risultati restano nascosti al giocatore.' : ''}
+      </p>
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Nome nemico"
+          className={cn(field, 'col-span-2')}
+          maxLength={40}
+        />
+        <input
+          value={mod}
+          onChange={(e) => setMod(e.target.value.replace(/[^0-9-]/g, ''))}
+          inputMode="numeric"
+          placeholder="Mod colpire"
+          className={field}
+        />
+        <input
+          value={dmg}
+          onChange={(e) => setDmg(e.target.value)}
+          placeholder="Danni (2d6+3)"
+          className={field}
+        />
+      </div>
+      <div className="mt-2 flex gap-2">
+        <button
+          type="button"
+          onClick={() => run(performRoll(token, `${label} · per colpire`, m, adv, undefined, secret))}
+          className="flex-1 rounded-lg border border-gold/60 px-3 py-2 text-sm text-parchment hover:border-gold"
+        >
+          Tira per colpire ({formatMod(m)})
+        </button>
+        <button
+          type="button"
+          disabled={!dmg.trim()}
+          onClick={() => run(performDice(token, dmg.trim(), secret))}
+          className="flex-1 rounded-lg border border-ochre/60 px-3 py-2 text-sm text-parchment hover:border-ochre disabled:opacity-40"
+        >
+          Tira i danni
+        </button>
+      </div>
+    </Panel>
   );
 }
 

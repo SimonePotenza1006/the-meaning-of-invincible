@@ -15,6 +15,28 @@ export interface RollRequestData {
   status?: 'pending';
 }
 
+/** A lightweight DM-managed NPC: core stats derived from race/class/level. */
+export interface Npc {
+  id: string;
+  name: string;
+  raceKey: string;
+  race: string;
+  classKey: string;
+  className: string;
+  subclassKey?: string;
+  subclass?: string;
+  level: number;
+  abilities: { STR: number; DEX: number; CON: number; INT: number; WIS: number; CHA: number };
+  maxHp: number;
+  currentHp: number;
+  armorClass: number;
+  speed: number;
+  proficiencyBonus: number;
+  hitDie: number;
+  savingThrows: string[];
+  notes?: string;
+}
+
 /** Snapshot of a monster/NPC stat block stored on a combatant. */
 export interface CombatantStatblock {
   index?: string;

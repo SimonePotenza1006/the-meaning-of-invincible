@@ -8,7 +8,7 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core';
 import type { CharacterSheet } from '../lib/sheet';
-import type { CombatantStatblock } from '../lib/game/types';
+import type { CombatantStatblock, Npc } from '../lib/game/types';
 
 // One standalone campaign = one DM + one player, distinguished by secret
 // tokens carried in the URL (no heavyweight auth for a two-person game).
@@ -20,6 +20,9 @@ export const campaigns = pgTable('campaigns', {
   status: text('status').notNull().default('setup'),
   dmToken: text('dm_token').notNull(),
   playerToken: text('player_token').notNull(),
+  // DM's private notepad and lightweight NPC roster (see src/lib/game/types.ts).
+  dmNotes: text('dm_notes').notNull().default(''),
+  npcs: jsonb('npcs').$type<Npc[]>().notNull().default([]),
   createdAt: timestamp('created_at', { withTimezone: true })
     .defaultNow()
     .notNull(),
