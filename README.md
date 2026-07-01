@@ -78,5 +78,8 @@ src/
 - **Font display:** il brief chiedeva "Montenegrin Gothic One", non disponibile su
   Google Fonts. È in uso **Dela Gothic One** (la più vicina); per usare il font reale
   basta sostituire `displayFont` in `src/lib/fonts.ts` con `next/font/local`.
-- **Deploy:** non ancora effettuato. In produzione, imposta `DATABASE_URL` sulla
-  stringa di Neon (l'app passerà automaticamente al driver `neon-http`).
+- **Deploy:** in produzione su Vercel → https://the-meaning-of-invincible.vercel.app
+  Repo GitHub collegata: ogni push su `master` fa un auto-deploy. Il DB è **Neon**
+  (integrazione Vercel Marketplace) che imposta `DATABASE_URL` automaticamente; l'app
+  passa da sola al driver `neon-http`. Dettagli operativi (migrazioni, scope, env pull)
+  nella sezione *Deployment* del `CLAUDE.md`.
