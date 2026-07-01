@@ -26,43 +26,44 @@ export interface IntroSlide {
  */
 export const INTRO_SLIDES: IntroSlide[] = [
   {
-    eyebrow: 'Una campagna per due',
-    title: 'The meaning of invincible',
+    eyebrow: '',
+    title: '',
     body: [
-      'Alcuni nascono per essere ricordati. Altri per essere temuti. Tu non sai ancora quale delle due cose sarai — ma il mondo sta per scoprirlo insieme a te.',
-      'Prima di alzare lo sguardo, respira. Questa storia comincia dal silenzio che precede la prima scelta.',
+      'Buio.',
+      'Le tenebre avvolgono i tuoi occhi.',
+      'Non riesci a capire cosa ci sia intorno a te.',
+      'Senti il tuo corpo fluttuare nel vuoto.'
     ],
   },
   {
-    eyebrow: 'Il mondo',
-    title: 'Una terra che non perdona',
+    eyebrow: '',
+    title: '',
     body: [
-      'Le strade sono vecchie e le leggende più vecchie ancora. C’è chi le racconta accanto al fuoco e chi preferisce dimenticarle, perché certe leggende hanno la brutta abitudine di tornare a bussare.',
-      'Qui la forza non basta. Servono nervi saldi, alleati veri e la testardaggine di rialzarsi una volta di più di quante volte cadi.',
+      '"Sei stata scelta, Eletta del tutto."',
+      'Una voce grave risuona nelle tue tempie. Non riesci a capire da dove provenga. Continui a non vedere nulla.',
     ],
   },
   {
-    eyebrow: 'La domanda',
-    title: 'Cosa significa essere invincibile?',
+    eyebrow: '',
+    title: '',
     body: [
-      'Non significa non essere mai feriti. Significa avere qualcosa per cui vale la pena tornare in piedi.',
-      'Nelle sessioni che verranno, ogni tiro di dado sarà una risposta parziale a questa domanda. La risposta definitiva la scriverai tu.',
+      'La voce prosegue il suo discorso, quasi come una litania:',
+      '"Il mondo versa nel caos. La guerra imperversa. I re lottano per un trono."',
+      '"Un trono che, alla fine, sarà il simbolo di un regno in macerie."',
     ],
   },
   {
-    eyebrow: 'Come si gioca',
-    title: 'Tu e il Master',
+    eyebrow: '',
+    title: '',
     body: [
-      'Il Master guida il mondo, gli incontri e le conseguenze. Tu guidi un’unica cosa, la più importante: il tuo personaggio.',
-      'La tua scheda è viva. Punti ferita, incantesimi, condizioni: tutto si aggiorna in tempo reale, così il Master vede ciò che vedi tu — senza che nessuno debba gridare i numeri attraverso il tavolo.',
+      '"Solo tu potrai salvare il mondo dal disastro, o scegliere di dargli una ultima spinta verso il baratro cui già è rivolto."',
     ],
   },
   {
-    eyebrow: 'Si comincia',
-    title: 'Adesso tocca a te',
+    eyebrow: '"Si comincia"',
+    title: '"Adesso tocca a te"',
     body: [
-      'Tra un momento darai un volto, un nome e un’anima al tuo eroe: razza, classe, storia. Non esiste una scelta sbagliata — esiste solo la tua.',
-      'Quando avrai finito, il Master saprà che sei pronto. E la prima pagina di "The meaning of invincible" si aprirà davvero.',
+      '"Riuscirai, come narrano le antiche leggende, a trovare finalmente il significato di essere invincibile?"',
     ],
   },
 ];
