@@ -1,5 +1,8 @@
 import 'server-only';
 import monstersData from '@/data/monsters.json';
+import { itMonsterName } from './it';
+
+export { itMonsterName } from './it';
 
 // SRD 5.1 bestiary (334 monsters), bundled so the app stays self-contained.
 export interface Monster {
@@ -40,7 +43,7 @@ export interface MonsterSummary {
 function summarize(m: Monster): MonsterSummary {
   return {
     index: m.index,
-    name: m.name,
+    name: itMonsterName(m.index, m.name),
     cr: m.cr,
     xp: m.xp,
     type: m.type,
@@ -62,13 +65,22 @@ export function searchMonsters({
   let list = MONSTERS;
   if (query) {
     const q = query.toLowerCase();
-    list = list.filter((m) => m.name.toLowerCase().includes(q));
+    // Match either the Italian name or the original English one.
+    list = list.filter(
+      (m) =>
+        itMonsterName(m.index, m.name).toLowerCase().includes(q) ||
+        m.name.toLowerCase().includes(q),
+    );
   }
   if (type) list = list.filter((m) => m.type === type);
   if (crMax !== undefined && !Number.isNaN(crMax)) list = list.filter((m) => m.cr <= crMax);
   return list
     .slice()
-    .sort((a, b) => a.cr - b.cr || a.name.localeCompare(b.name))
+    .sort(
+      (a, b) =>
+        a.cr - b.cr ||
+        itMonsterName(a.index, a.name).localeCompare(itMonsterName(b.index, b.name), 'it'),
+    )
     .slice(0, 80)
     .map(summarize);
 }

@@ -3,7 +3,7 @@
 import { and, desc, eq, isNull, ne, or } from 'drizzle-orm';
 import { campaigns, characters, combatants, db, encounters, events } from '@/db';
 import type { CharacterSheet } from '@/lib/sheet';
-import { getMonster } from '@/lib/monsters';
+import { getMonster, itMonsterName } from '@/lib/monsters';
 
 function d20(): number {
   return Math.floor(Math.random() * 20) + 1;
@@ -121,7 +121,7 @@ export async function addMonsterCombatant(
 
   const rows = Array.from({ length: n }, (_, i) => ({
     encounterId: enc.id,
-    name: `${m.name} ${alreadyOfKind + i + 1}`,
+    name: `${itMonsterName(m.index, m.name)} ${alreadyOfKind + i + 1}`,
     side,
     sourceType: 'monster',
     monsterIndex,
@@ -146,7 +146,7 @@ export async function addMonsterCombatant(
     campaign.id,
     'dm',
     'note',
-    `Aggiunti ${n}× ${m.name} (${side === 'enemy' ? 'nemici' : 'alleati'}).`,
+    `Aggiunti ${n}× ${itMonsterName(m.index, m.name)} (${side === 'enemy' ? 'nemici' : 'alleati'}).`,
   );
   return { ok: true };
 }
