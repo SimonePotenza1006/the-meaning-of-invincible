@@ -1,38 +1,8 @@
-import Link from 'next/link';
-import { GiDiceTwentyFacesTwenty } from 'react-icons/gi';
+import { redirect } from 'next/navigation';
 
+// Single fixed campaign: the front door is the player experience (presentation →
+// character creation → sheet). The Master uses /dm directly; the legacy landing
+// with both doors is kept at /menu.
 export default function Home() {
-  return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center px-6 py-16 text-center">
-      <GiDiceTwentyFacesTwenty className="mb-6 h-16 w-16 text-gold" aria-hidden />
-      <h1 className="font-display text-3xl leading-tight text-parchment">
-        La tua avventura
-        <br />
-        inizia qui
-      </h1>
-      <span
-        className="mt-5 h-1 w-28 rounded-full"
-        style={{ backgroundImage: 'var(--gradient-quest)' }}
-        aria-hidden
-      />
-      <p className="mt-5 max-w-sm text-parchment-dim">
-        Crea il tuo personaggio di Dungeons &amp; Dragons 5e passo dopo passo: scegli razza,
-        classe e destino, poi entra in gioco.
-      </p>
-      <div className="mt-8 flex w-full max-w-xs flex-col gap-3">
-        <Link
-          href="/dm"
-          className="inline-flex items-center justify-center rounded-xl bg-gold px-6 py-3 font-medium text-[color:var(--color-ink)] transition-all hover:brightness-110"
-        >
-          Sono il Master
-        </Link>
-        <Link
-          href="/crea"
-          className="inline-flex items-center justify-center rounded-xl border border-ink-border px-6 py-3 font-medium text-parchment transition-colors hover:border-ochre"
-        >
-          Crea un personaggio
-        </Link>
-      </div>
-    </main>
-  );
+  redirect('/play');
 }

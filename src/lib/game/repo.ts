@@ -74,3 +74,39 @@ export async function loadState(tok: string): Promise<CampaignState | null> {
 export async function listCampaigns(): Promise<Campaign[]> {
   return db.select().from(campaigns).orderBy(desc(campaigns.id)).limit(50);
 }
+
+/** The one and only campaign this app runs. */
+export const CAMPAIGN_NAME = 'The meaning of invincible';
+
+function newToken(): string {
+  return crypto.randomUUID().replace(/-/g, '');
+}
+
+/**
+ * This app hosts a single fixed campaign ("The meaning of invincible") shared by
+ * one DM and one player — there is no campaign-creation flow. The row is created
+ * lazily on first access (oldest campaign wins if several already exist, so we
+ * stay stable across restarts). Callers get its tokens to drive the existing
+ * token-based state/polling machinery without exposing them in the URL.
+ */
+export async function getOrCreateSingletonCampaign(): Promise<Campaign> {
+  // Match by name so leftover test campaigns can't be mistaken for the real one.
+  const [existing] = await db
+    .select()
+    .from(campaigns)
+    .where(eq(campaigns.name, CAMPAIGN_NAME))
+    .orderBy(campaigns.id)
+    .limit(1);
+  if (existing) return existing;
+
+  const [created] = await db
+    .insert(campaigns)
+    .values({
+      name: CAMPAIGN_NAME,
+      status: 'setup',
+      dmToken: newToken(),
+      playerToken: newToken(),
+    })
+    .returning();
+  return created;
+}
