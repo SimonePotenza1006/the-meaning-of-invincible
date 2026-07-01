@@ -5,6 +5,7 @@ import { WEAPONS, isVersatile, resolveAttack, weaponName } from '@/lib/combat/we
 import { performDice, performRoll, type Adv } from '@/lib/game/roll';
 import { addWeaponAttack, removeAttack } from '@/app/game-actions';
 import { Panel, cn } from '@/app/crea/ui';
+import { ActionGlyph, ActionLegend } from '@/components/action-cost';
 import type { CharacterSheet } from '@/lib/sheet';
 
 export function AttacksPanel({
@@ -34,6 +35,7 @@ export function AttacksPanel({
       {attacks.length === 0 && (
         <p className="mb-3 text-sm text-parchment-dim">Nessun attacco. Aggiungi un&rsquo;arma qui sotto.</p>
       )}
+      {attacks.length > 0 && <ActionLegend className="mb-2" />}
       <ul className="space-y-2">
         {attacks.map((a, i) => {
           const r = resolveAttack(a, sheet);
@@ -43,7 +45,10 @@ export function AttacksPanel({
               className="flex items-center justify-between gap-2 rounded-lg border border-ink-border bg-ink-raised px-3 py-2"
             >
               <div className="min-w-0">
-                <span className="block truncate text-parchment">{r.label}</span>
+                <span className="flex items-center gap-1.5 truncate text-parchment">
+                  <ActionGlyph cost="action" className="shrink-0" />
+                  {r.label}
+                </span>
                 <span className="text-xs text-parchment-dim">
                   {r.damage ? `${r.damage} ${r.damageType}` : 'senza danni'}
                   {a.twoHanded ? ' · a due mani' : ''}

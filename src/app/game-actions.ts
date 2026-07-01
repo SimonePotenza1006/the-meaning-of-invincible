@@ -12,6 +12,7 @@ import {
   mergePending,
 } from '@/lib/character/levelup';
 import { getWeapon, weaponName } from '@/lib/combat/weapons';
+import { spellActionCost } from '@/lib/spells';
 import { applyItemStats } from '@/lib/character/items';
 import type { MagicItem, MagicItemEffect } from '@/lib/sheet';
 import type { SaveResult } from '@/lib/game/types';
@@ -173,18 +174,23 @@ export async function setTempHp(tok: string, value: number) {
   });
 }
 
+// Only the DM assigns/removes conditions; the player just receives them.
 export async function toggleCondition(tok: string, condition: string) {
-  return mutate(tok, (s) => {
-    const set = new Set(s.conditions);
-    const had = set.has(condition);
-    if (had) set.delete(condition);
-    else set.add(condition);
-    s.conditions = [...set];
-    return {
-      kind: 'condition',
-      message: had ? `Rimossa condizione: ${condition}.` : `Applicata condizione: ${condition}.`,
-    };
-  });
+  return mutate(
+    tok,
+    (s) => {
+      const set = new Set(s.conditions);
+      const had = set.has(condition);
+      if (had) set.delete(condition);
+      else set.add(condition);
+      s.conditions = [...set];
+      return {
+        kind: 'condition',
+        message: had ? `Rimossa condizione: ${condition}.` : `Applicata condizione: ${condition}.`,
+      };
+    },
+    { dmOnly: true },
+  );
 }
 
 export async function setDeathSaves(tok: string, successes: number, failures: number) {
@@ -270,7 +276,7 @@ export async function learnSpell(tok: string, spell: SpellRef) {
     if (!s.spellcasting) return { kind: 'note', message: 'Questo personaggio non lancia incantesimi.' };
     const bucket = spell.level === 0 ? s.spellcasting.cantrips : s.spellcasting.known;
     if (bucket.some((x) => x.index === spell.index)) return;
-    bucket.push({ index: spell.index, name: spell.name, level: spell.level });
+    bucket.push({ index: spell.index, name: spell.name, level: spell.level, action: spellActionCost(spell.index) });
     return {
       kind: 'spell',
       message: spell.level === 0 ? `Nuovo trucchetto: ${spell.name}.` : `Impara ${spell.name} (liv ${spell.level}).`,

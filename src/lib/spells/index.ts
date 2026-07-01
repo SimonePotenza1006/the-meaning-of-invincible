@@ -35,6 +35,8 @@ export interface SpellListItem {
   classes: string[];
   concentration: boolean;
   ritual: boolean;
+  /** Casting-time category, for the action-economy glyph. */
+  action: SpellActionCost;
   /** true when a fresh Italian name exists (else falls back to English). */
   it: boolean;
 }
@@ -46,6 +48,22 @@ export interface SpellDetail extends SpellListItem {
   material: string;
   duration: string;
   summary: string;
+}
+
+export type SpellActionCost = 'action' | 'bonus' | 'reaction' | 'other';
+
+/** Categorise a raw English casting time into an action-economy bucket. */
+function categorizeCasting(raw?: string): SpellActionCost {
+  const t = (raw ?? '').toLowerCase();
+  if (t.includes('bonus action')) return 'bonus';
+  if (t.includes('reaction')) return 'reaction';
+  if (t.includes('action')) return 'action';
+  return 'other';
+}
+
+/** Action-economy cost of casting a spell, by index (for the action glyph). */
+export function spellActionCost(index: string): SpellActionCost {
+  return categorizeCasting(SPELLS.find((s) => s.index === index)?.casting_time);
 }
 
 function itName(s: RawSpell): string {
@@ -61,6 +79,7 @@ function toItem(s: RawSpell): SpellListItem {
     classes: s.classes,
     concentration: s.concentration,
     ritual: s.ritual,
+    action: categorizeCasting(s.casting_time),
     it: !!SPELL_IT[s.index],
   };
 }

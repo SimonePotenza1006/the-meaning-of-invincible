@@ -13,6 +13,7 @@ import {
   type MagicItemInput,
 } from '@/app/game-actions';
 import { Panel, cn } from '@/app/crea/ui';
+import { ActionGlyph } from '@/components/action-cost';
 import type { CharacterSheet, MagicItem, MagicItemEffect } from '@/lib/sheet';
 
 const RARITIES = ['Comune', 'Non comune', 'Raro', 'Molto raro', 'Leggendario'];
@@ -161,8 +162,9 @@ function ItemCard({
             <button
               type="button"
               onClick={onUse}
-              className="rounded-md border border-gold/60 px-2.5 py-1 text-sm text-parchment hover:border-gold"
+              className="inline-flex items-center gap-1.5 rounded-md border border-gold/60 px-2.5 py-1 text-sm text-parchment hover:border-gold"
             >
+              <ActionGlyph cost="action" />
               {spell ? 'Lancia' : 'Usa'}
             </button>
           )}

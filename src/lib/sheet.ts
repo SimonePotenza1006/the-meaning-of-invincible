@@ -76,11 +76,17 @@ export const spellSlotSchema = z.object({
   used: z.number().int().min(0),
 });
 
+/** Action economy cost of an activatable thing (spell, attack, item). */
+export const actionCostEnum = z.enum(['action', 'bonus', 'reaction', 'other']);
+export type ActionCost = z.infer<typeof actionCostEnum>;
+
 /** A spell the character has learned/prepared, denormalized for display. */
 export const knownSpellSchema = z.object({
   index: z.string(),
   name: z.string(),
   level: z.number().int().min(0).max(9),
+  /** Casting-time category, stored so the client can show the action glyph. */
+  action: actionCostEnum.optional(),
 });
 
 export const spellcastingSchema = z

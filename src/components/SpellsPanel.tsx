@@ -13,7 +13,8 @@ import {
 } from '@/app/game-actions';
 import { Panel, cn } from '@/app/crea/ui';
 import { StatTile, Stepper } from '@/components/game';
-import type { CharacterSheet, KnownSpell } from '@/lib/sheet';
+import { ActionGlyph, ActionLegend } from '@/components/action-cost';
+import type { ActionCost, CharacterSheet, KnownSpell } from '@/lib/sheet';
 
 interface SpellItem {
   index: string;
@@ -23,6 +24,7 @@ interface SpellItem {
   classes: string[];
   concentration: boolean;
   ritual: boolean;
+  action: ActionCost;
   it: boolean;
 }
 interface SpellDetail extends SpellItem {
@@ -87,6 +89,7 @@ export function SpellsPanel({
         {plan.spells != null ? `/${plan.spells}` : ''}
         {plan.spellbook != null ? ` · Libro ${sc.known.length}/${plan.spellbook}` : ''}
       </p>
+      <ActionLegend className="mt-1.5" />
 
       {/* Slots */}
       {sc.slots.map((slot) => (
@@ -193,6 +196,7 @@ function SpellRow({
             {prepared ? '★' : '☆'}
           </button>
         )}
+        <ActionGlyph cost={spell.action ?? 'action'} className="shrink-0" />
         <span className="truncate text-parchment">{spell.name}</span>
         {spell.level > 0 && <span className="shrink-0 text-xs text-parchment-dim">L{spell.level}</span>}
       </div>
@@ -311,6 +315,7 @@ function SpellBrowser({
                   onClick={() => toggleDetail(sp.index)}
                   className="flex min-w-0 flex-1 items-center gap-2 text-left"
                 >
+                  <ActionGlyph cost={sp.action} className="shrink-0" />
                   <span className="truncate text-parchment">{sp.name}</span>
                   {!sp.it && (
                     <span className="shrink-0 rounded bg-ink-border px-1 text-[10px] text-parchment-dim">EN</span>

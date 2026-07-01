@@ -1,39 +1,22 @@
 'use client';
 
 import { useState } from 'react';
+import {
+  GiCrossedSwords,
+  GiDiceTwentyFacesTwenty,
+  GiHearts,
+  GiSpellBook,
+  GiSwapBag,
+} from 'react-icons/gi';
 import { ABILITIES, type Ability, formatMod } from '@/lib/rules';
-import {
-  ABILITY_LABELS,
-  ABILITY_SHORT,
-  CONDITIONS,
-  SKILL_LABELS,
-  skillLabel,
-} from '@/lib/dnd';
-import {
-  abilityMod,
-  initiativeMod,
-  saveMod,
-  skillMod,
-} from '@/lib/character/derive-sheet';
+import { ABILITY_LABELS, ABILITY_SHORT, SKILL_LABELS, skillLabel } from '@/lib/dnd';
+import { abilityMod, initiativeMod, saveMod, skillMod } from '@/lib/character/derive-sheet';
 import { useCampaignState } from '@/lib/game/client';
 import { performDice, performRoll, type Adv } from '@/lib/game/roll';
-import {
-  changeHp,
-  setDeathSaves,
-  setTempHp,
-  spendHitDie,
-  toggleCondition,
-} from '@/app/game-actions';
-import {
-  AdvToggle,
-  HpBar,
-  LogFeed,
-  RollRow,
-  RollTile,
-  StatTile,
-  Stepper,
-} from '@/components/game';
-import { Chip, cn, Panel } from '@/app/crea/ui';
+import { changeHp, setDeathSaves, setTempHp, spendHitDie } from '@/app/game-actions';
+import { AdvToggle, HpBar, LogFeed, RollRow, RollTile, StatTile, Stepper } from '@/components/game';
+import { cn, Panel } from '@/app/crea/ui';
+import { SheetShell, type ShellSection } from '@/components/SheetShell';
 import { CombatTracker } from '@/components/combat/CombatTracker';
 import { LevelUpPanel } from '@/components/LevelUpPanel';
 import { AttacksPanel } from '@/components/AttacksPanel';
@@ -91,54 +74,13 @@ export function PlayerSheet({ token, initial }: { token: string; initial: Campai
     return 0;
   }
 
-  return (
-    <main className="mx-auto w-full max-w-md flex-1 space-y-4 px-5 py-6">
-      {/* Identity */}
-      <div className="rounded-xl border border-gold/40 bg-burgundy/30 p-4 text-center">
-        <h1 className="font-display text-2xl text-parchment">{sheet.identity.name}</h1>
-        <p className="mt-1 text-sm text-parchment-dim">
-          {sheet.identity.subrace ?? sheet.identity.race} · {sheet.identity.className}
-          {sheet.identity.subclass ? ` · ${sheet.identity.subclass}` : ''} · Liv{' '}
-          {sheet.identity.level}
-        </p>
-        <p className="text-xs text-parchment-dim">PE {sheet.identity.xp}</p>
-      </div>
-
-      <LevelUpPanel token={token} sheet={sheet} refresh={refresh} />
-
+  // ── Section: Vitali (identity, HP, combat, conditions, dice) ──
+  const vitali = (
+    <>
       <CombatTracker token={token} state={state} refresh={refresh} />
 
-      {/* Pending DM requests */}
-      {pending.map((e) => {
-        const data = (e.data ?? {}) as RequestData;
-        const useAdv: Adv = data.advantage ? 'advantage' : adv;
-        return (
-          <div
-            key={e.id}
-            className="flex items-center justify-between gap-3 rounded-xl border border-gold bg-burgundy/40 p-4"
-          >
-            <div>
-              <div className="text-xs uppercase tracking-wide text-gold">Il DM chiede un tiro</div>
-              <div className="text-parchment">{data.label}</div>
-            </div>
-            <button
-              type="button"
-              onClick={() => run(performRoll(token, data.label ?? 'Tiro', reqMod(data), useAdv, e.id))}
-              className="shrink-0 rounded-lg bg-gold px-4 py-2 font-medium text-[color:var(--color-ink)] hover:brightness-110"
-            >
-              Tira
-            </button>
-          </div>
-        );
-      })}
-
-      {/* HP */}
       <Panel title="Punti Ferita">
-        <HpBar
-          current={sheet.combat.currentHp}
-          max={sheet.combat.maxHp}
-          temp={sheet.combat.tempHp}
-        />
+        <HpBar current={sheet.combat.currentHp} max={sheet.combat.maxHp} temp={sheet.combat.tempHp} />
         <div className="mt-3 flex flex-wrap items-center gap-2">
           {[-5, -1, 1, 5].map((d) => (
             <button
@@ -170,7 +112,6 @@ export function PlayerSheet({ token, initial }: { token: string; initial: Campai
         )}
       </Panel>
 
-      {/* Death saves */}
       {sheet.combat.currentHp === 0 && (
         <Panel title="Tiri salvezza contro morte">
           <DeathDots
@@ -195,7 +136,6 @@ export function PlayerSheet({ token, initial }: { token: string; initial: Campai
         </Panel>
       )}
 
-      {/* Combat */}
       <div className="grid grid-cols-4 gap-2">
         <StatTile label="CA" value={sheet.combat.armorClass} />
         <StatTile label="Velocità" value={`${sheet.combat.speed}m`} />
@@ -208,16 +148,48 @@ export function PlayerSheet({ token, initial }: { token: string; initial: Campai
         </button>
       </div>
 
-      {/* Advantage toggle */}
       <div>
         <p className="mb-2 text-xs uppercase tracking-wide text-parchment-dim">Modalità di tiro</p>
         <AdvToggle value={adv} onChange={setAdv} />
       </div>
 
-      {/* Attacks */}
-      <AttacksPanel token={token} sheet={sheet} refresh={refresh} adv={adv} />
+      <Panel title="Stati e condizioni">
+        {sheet.conditions.length === 0 ? (
+          <p className="text-sm text-parchment-dim">Nessuno stato attivo. È il DM ad assegnare gli stati.</p>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {sheet.conditions.map((c) => (
+              <span
+                key={c}
+                className="rounded-full border border-flag-red/50 bg-flag-red/10 px-3 py-1 text-sm text-flag-red"
+              >
+                {c}
+              </span>
+            ))}
+          </div>
+        )}
+      </Panel>
 
-      {/* Abilities */}
+      <Panel title="Dadi">
+        <div className="flex flex-wrap gap-2">
+          {DICE.map((d) => (
+            <button
+              key={d}
+              type="button"
+              onClick={() => run(performDice(token, d))}
+              className="rounded-md border border-ink-border px-3 py-1.5 text-sm text-parchment hover:border-gold"
+            >
+              {d}
+            </button>
+          ))}
+        </div>
+      </Panel>
+    </>
+  );
+
+  // ── Section: Prove (abilities, saves, skills) ──
+  const prove = (
+    <>
       <Panel title="Caratteristiche — tocca per tirare">
         <div className="grid grid-cols-3 gap-2">
           {ABILITIES.map((a) => (
@@ -234,7 +206,6 @@ export function PlayerSheet({ token, initial }: { token: string; initial: Campai
         </div>
       </Panel>
 
-      {/* Saving throws */}
       <Panel title="Tiri salvezza">
         <div className="grid grid-cols-2 gap-2">
           {ABILITIES.map((a) => (
@@ -243,15 +214,12 @@ export function PlayerSheet({ token, initial }: { token: string; initial: Campai
               label={ABILITY_LABELS[a]}
               mod={saveMod(sheet, a)}
               highlight={sheet.proficiencies.savingThrows.includes(a)}
-              onClick={() =>
-                run(performRoll(token, `TS ${ABILITY_LABELS[a]}`, saveMod(sheet, a), adv))
-              }
+              onClick={() => run(performRoll(token, `TS ${ABILITY_LABELS[a]}`, saveMod(sheet, a), adv))}
             />
           ))}
         </div>
       </Panel>
 
-      {/* Skills */}
       <Panel title="Abilità">
         <div className="grid gap-2">
           {SKILL_KEYS.map((s) => (
@@ -265,48 +233,81 @@ export function PlayerSheet({ token, initial }: { token: string; initial: Campai
           ))}
         </div>
       </Panel>
+    </>
+  );
 
-      {/* Spellcasting */}
-      <SpellsPanel token={token} sheet={sheet} refresh={refresh} />
+  const sections: ShellSection[] = [
+    { id: 'vitali', label: 'Vitali', icon: <GiHearts />, content: vitali },
+    {
+      id: 'attacchi',
+      label: 'Attacchi',
+      icon: <GiCrossedSwords />,
+      content: <AttacksPanel token={token} sheet={sheet} refresh={refresh} adv={adv} />,
+    },
+    { id: 'prove', label: 'Prove', icon: <GiDiceTwentyFacesTwenty />, content: prove },
+    {
+      id: 'incantesimi',
+      label: 'Incantesimi',
+      icon: <GiSpellBook />,
+      hidden: !sheet.spellcasting,
+      content: <SpellsPanel token={token} sheet={sheet} refresh={refresh} />,
+    },
+    {
+      id: 'oggetti',
+      label: 'Oggetti',
+      icon: <GiSwapBag />,
+      content: <MagicItemsPanel token={token} sheet={sheet} refresh={refresh} />,
+    },
+  ];
 
-      {/* Magic items */}
-      <MagicItemsPanel token={token} sheet={sheet} refresh={refresh} />
-
-      {/* Conditions */}
-      <Panel title="Condizioni">
-        <div className="flex flex-wrap gap-2">
-          {CONDITIONS.map((c) => (
-            <Chip
-              key={c}
-              label={c}
-              selected={sheet.conditions.includes(c)}
-              onClick={() => run(toggleCondition(token, c))}
-            />
-          ))}
-        </div>
-      </Panel>
-
-      {/* Dice tray */}
-      <Panel title="Dadi">
-        <div className="flex flex-wrap gap-2">
-          {DICE.map((d) => (
-            <button
-              key={d}
-              type="button"
-              onClick={() => run(performDice(token, d))}
-              className="rounded-md border border-ink-border px-3 py-1.5 text-sm text-parchment hover:border-gold"
+  const banner =
+    pending.length > 0 ? (
+      <div className="space-y-2 p-3">
+        {pending.map((e) => {
+          const data = (e.data ?? {}) as RequestData;
+          const useAdv: Adv = data.advantage ? 'advantage' : adv;
+          return (
+            <div
+              key={e.id}
+              className="flex items-center justify-between gap-3 rounded-xl border border-gold bg-burgundy/40 p-3"
             >
-              {d}
-            </button>
-          ))}
-        </div>
-      </Panel>
+              <div>
+                <div className="text-xs uppercase tracking-wide text-gold">Il DM chiede un tiro</div>
+                <div className="text-parchment">{data.label}</div>
+              </div>
+              <button
+                type="button"
+                onClick={() => run(performRoll(token, data.label ?? 'Tiro', reqMod(data), useAdv, e.id))}
+                className="shrink-0 rounded-lg bg-gold px-4 py-2 font-medium text-[color:var(--color-ink)] hover:brightness-110"
+              >
+                Tira
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    ) : undefined;
 
-      {/* Log */}
-      <Panel title="Cronaca">
-        <LogFeed events={state.events} />
-      </Panel>
-    </main>
+  return (
+    <>
+      {/* Non-dismissable level-up dialog — overlays any section */}
+      <LevelUpPanel token={token} sheet={sheet} refresh={refresh} />
+
+      <SheetShell
+        eyebrow="La tua scheda"
+        title={sheet.identity.name}
+        subtitle={
+          <>
+            {sheet.identity.subrace ?? sheet.identity.race} · {sheet.identity.className}
+            {sheet.identity.subclass ? ` · ${sheet.identity.subclass}` : ''} · Liv {sheet.identity.level}
+            {' · '}PE {sheet.identity.xp}
+          </>
+        }
+        sections={sections}
+        banner={banner}
+        log={<LogFeed events={state.events} />}
+      />
+    </>
   );
 }
 

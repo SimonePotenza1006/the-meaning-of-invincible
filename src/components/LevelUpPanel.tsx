@@ -56,8 +56,18 @@ export function LevelUpPanel({
       : []),
   ];
 
+  // Choices that MUST be made before the level-up can be confirmed. The dialog
+  // cannot be dismissed until these are resolved.
+  const mustResolve = p.needsSubclass || p.needsAsi;
+
   return (
-    <section className="rounded-xl border-2 border-gold bg-burgundy/40 p-4 shadow-[0_10px_30px_-14px_var(--color-gold)]">
+    <div
+      className="fixed inset-0 z-50 flex overflow-y-auto bg-black/75 p-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Sei salito al livello ${p.level}`}
+    >
+    <section className="m-auto w-full max-w-md rounded-xl border-2 border-gold bg-ink-raised p-4 shadow-[0_20px_60px_-15px_var(--color-gold)]">
       <div className="mb-1 flex items-center gap-2">
         <span className="text-lg" aria-hidden>
           ✦
@@ -65,7 +75,8 @@ export function LevelUpPanel({
         <h2 className="font-display text-xl text-parchment">Sei salito al livello {p.level}!</h2>
       </div>
       <p className="mb-4 text-sm text-parchment-dim">
-        Sistema il tuo nuovo livello come preferisci, poi conferma.
+        Sistema il tuo nuovo livello e completa le scelte richieste: questa finestra
+        resta aperta finché non hai finito.
       </p>
 
       <div className="space-y-4">
@@ -154,16 +165,24 @@ export function LevelUpPanel({
           </div>
         )}
 
+        {mustResolve && (
+          <p className="text-center text-xs text-ochre">
+            Completa {p.needsSubclass ? 'la sottoclasse' : ''}
+            {p.needsSubclass && p.needsAsi ? ' e ' : ''}
+            {p.needsAsi ? 'l’aumento di caratteristiche' : ''} per continuare.
+          </p>
+        )}
         <button
           type="button"
-          disabled={busy}
+          disabled={busy || mustResolve}
           onClick={() => run(() => finishLevelUp(token))}
-          className="w-full rounded-xl bg-gold px-5 py-3 font-medium text-[color:var(--color-ink)] transition-all hover:brightness-110 disabled:opacity-60"
+          className="w-full rounded-xl bg-gold px-5 py-3 font-medium text-[color:var(--color-ink)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Ho finito · conferma il livello
         </button>
       </div>
     </section>
+    </div>
   );
 }
 
