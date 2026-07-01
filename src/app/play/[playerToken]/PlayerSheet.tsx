@@ -26,6 +26,7 @@ import { AttacksPanel } from '@/components/AttacksPanel';
 import { SpellsPanel } from '@/components/SpellsPanel';
 import { MagicItemsPanel } from '@/components/MagicItemsPanel';
 import { NotesPanel } from '@/components/NotesPanel';
+import { RollRequestDialog } from '@/components/RollRequestDialog';
 import type { CampaignState } from '@/lib/game/repo';
 
 const DICE = ['d20', 'd12', 'd10', 'd8', 'd6', 'd4'];
@@ -316,38 +317,25 @@ export function PlayerSheet({ token, initial }: { token: string; initial: Campai
     },
   ];
 
-  const banner =
-    pending.length > 0 ? (
-      <div className="space-y-2 p-3">
-        {pending.map((e) => {
-          const data = (e.data ?? {}) as RequestData;
-          const useAdv: Adv = data.advantage ? 'advantage' : adv;
-          return (
-            <div
-              key={e.id}
-              className="flex items-center justify-between gap-3 rounded-xl border border-gold bg-burgundy/40 p-3"
-            >
-              <div>
-                <div className="text-xs uppercase tracking-wide text-gold">Il DM chiede un tiro</div>
-                <div className="text-parchment">{data.label}</div>
-              </div>
-              <button
-                type="button"
-                onClick={() => run(performRoll(token, data.label ?? 'Tiro', reqMod(data), useAdv, e.id))}
-                className="shrink-0 rounded-lg bg-gold px-4 py-2 font-medium text-[color:var(--color-ink)] hover:brightness-110"
-              >
-                Tira
-              </button>
-            </div>
-          );
-        })}
-      </div>
-    ) : undefined;
+  // Answer the oldest pending request first.
+  const pendingOrdered = [...pending].reverse();
 
   return (
     <>
-      {/* Non-dismissable level-up dialog — overlays any section */}
-      <LevelUpPanel token={token} sheet={sheet} refresh={refresh} />
+      {/* Non-dismissable dialogs — overlay any section. Level-up takes priority. */}
+      {sheet.pendingLevelUp ? (
+        <LevelUpPanel token={token} sheet={sheet} refresh={refresh} />
+      ) : (
+        pendingOrdered.length > 0 && (
+          <RollRequestDialog
+            key={pendingOrdered[0].id}
+            requests={pendingOrdered}
+            token={token}
+            modFor={reqMod}
+            onRolled={refresh}
+          />
+        )
+      )}
 
       <SheetShell
         eyebrow="La tua scheda"
@@ -360,7 +348,6 @@ export function PlayerSheet({ token, initial }: { token: string; initial: Campai
           </>
         }
         sections={sections}
-        banner={banner}
         log={<LogFeed events={state.events} />}
       />
     </>
