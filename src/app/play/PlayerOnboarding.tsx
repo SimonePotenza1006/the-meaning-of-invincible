@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CreationWizard } from '@/app/crea/CreationWizard';
 import { FORCE_INTRO, INTRO_SEEN_KEY } from '@/lib/story/intro';
+import { cn } from '@/app/crea/ui';
 import type { CharacterSheet } from '@/lib/sheet';
 import type { SaveResult } from '@/lib/game/types';
 import { IntroPresentation } from './IntroPresentation';
@@ -24,6 +25,9 @@ export function PlayerOnboarding({
   const router = useRouter();
   // `null` = deciding (avoids a flash of the wrong screen before we read storage).
   const [showIntro, setShowIntro] = useState<boolean | null>(null);
+  // True when we've just come out of the intro's water transition (ends on
+  // black) — the wizard then fades in from black instead of cutting in.
+  const [fadeIn, setFadeIn] = useState(false);
 
   useEffect(() => {
     if (FORCE_INTRO) {
@@ -40,6 +44,7 @@ export function PlayerOnboarding({
     } catch {
       // Private mode / storage disabled — worst case the intro shows again.
     }
+    setFadeIn(true);
     setShowIntro(false);
   }
 
@@ -47,5 +52,39 @@ export function PlayerOnboarding({
   if (showIntro) return <IntroPresentation onDone={finishIntro} />;
 
   // On completion, refresh so the server swaps the wizard for the live sheet.
-  return <CreationWizard save={save} onComplete={() => router.refresh()} />;
+  const wizard = <CreationWizard save={save} onComplete={() => router.refresh()} />;
+  return fadeIn ? <FadeFromBlack>{wizard}</FadeFromBlack> : wizard;
+}
+
+/**
+ * Renders its children with a black overlay on top that fades away on mount,
+ * so the screen gently emerges from black (continuing the intro's fade-out).
+ */
+function FadeFromBlack({ children }: { children: React.ReactNode }) {
+  const [lifting, setLifting] = useState(false);
+  const [gone, setGone] = useState(false);
+
+  useEffect(() => {
+    const start = window.setTimeout(() => setLifting(true), 40);
+    const end = window.setTimeout(() => setGone(true), 1240);
+    return () => {
+      window.clearTimeout(start);
+      window.clearTimeout(end);
+    };
+  }, []);
+
+  return (
+    <>
+      {children}
+      {!gone && (
+        <div
+          aria-hidden
+          className={cn(
+            'pointer-events-none fixed inset-0 z-50 bg-black transition-opacity duration-1000 ease-in-out',
+            lifting ? 'opacity-0' : 'opacity-100',
+          )}
+        />
+      )}
+    </>
+  );
 }

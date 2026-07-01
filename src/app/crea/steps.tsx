@@ -27,9 +27,15 @@ import {
 import { ChoiceCard, Chip, cn, InfoRow, Panel } from './ui';
 
 function bonusText(bonuses: AbilityBonuses, choice?: BonusChoice): string {
-  const parts = ABILITIES.filter((a) => bonuses[a]).map(
-    (a) => `${ABILITY_SHORT[a]} +${bonuses[a]}`,
-  );
+  const active = ABILITIES.filter((a) => bonuses[a]);
+  // Collapse "every ability by the same amount" (e.g. Human +1) so the tile
+  // subtitle stays short instead of listing all six and overflowing.
+  const allSame =
+    active.length === ABILITIES.length &&
+    active.every((a) => bonuses[a] === bonuses[active[0]]);
+  const parts = allSame
+    ? [`Tutte +${bonuses[active[0]]}`]
+    : active.map((a) => `${ABILITY_SHORT[a]} +${bonuses[a]}`);
   if (choice) parts.push(`+${choice.amount} a ${choice.count} a scelta`);
   return parts.join(' · ');
 }

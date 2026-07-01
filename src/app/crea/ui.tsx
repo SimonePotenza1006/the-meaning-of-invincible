@@ -127,7 +127,9 @@ export function ChoiceCard({
             {title}
           </span>
           {subtitle && (
-            <span className="shrink-0 text-xs text-parchment-dim">{subtitle}</span>
+            <span className="max-w-[50%] shrink-0 text-right text-xs text-parchment-dim">
+              {subtitle}
+            </span>
           )}
         </span>
         {description && (
