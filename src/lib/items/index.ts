@@ -18,6 +18,21 @@ export interface RawConsumable {
 
 const CONSUMABLES = consumablesData as RawConsumable[];
 
+// Spell level carried by each spell-scroll, so the DM can only bind a spell of
+// the matching level when creating the scroll.
+const SCROLL_LEVEL: Record<string, number> = {
+  'spell-scroll-cantrip': 0,
+  'spell-scroll-1st': 1,
+  'spell-scroll-2nd': 2,
+  'spell-scroll-3rd': 3,
+  'spell-scroll-4th': 4,
+  'spell-scroll-5th': 5,
+  'spell-scroll-6th': 6,
+  'spell-scroll-7th': 7,
+  'spell-scroll-8th': 8,
+  'spell-scroll-9th': 9,
+};
+
 export interface ConsumableItem {
   index: string;
   name: string;
@@ -30,6 +45,8 @@ export interface ConsumableItem {
   summary: string;
   /** true when a fresh Italian summary exists (else falls back to English). */
   it: boolean;
+  /** For spell scrolls: the level of spell the DM must bind to it. */
+  scrollLevel?: number;
 }
 
 function toItem(c: RawConsumable): ConsumableItem {
@@ -43,6 +60,7 @@ function toItem(c: RawConsumable): ConsumableItem {
     attunement: c.attunement,
     summary: it?.summary ?? c.description,
     it: !!it,
+    scrollLevel: SCROLL_LEVEL[c.index],
   };
 }
 

@@ -13,6 +13,13 @@ interface ConsumableItem {
   attunement: boolean;
   summary: string;
   it: boolean;
+  scrollLevel?: number;
+}
+
+interface SpellPick {
+  index: string;
+  name: string;
+  level: number;
 }
 
 interface CategoryOpt {
@@ -69,7 +76,7 @@ export function ConsumablesCatalogPanel({ token, refresh }: { token: string; ref
     return [...map.entries()];
   }, [items]);
 
-  async function assign(item: ConsumableItem, quantity: number) {
+  async function assign(item: ConsumableItem, quantity: number, spell?: SpellPick) {
     setBusy(item.index);
     try {
       await assignConsumable(token, {
@@ -78,6 +85,7 @@ export function ConsumablesCatalogPanel({ token, refresh }: { token: string; ref
         description: item.summary,
         rarity: item.rarity,
         quantity,
+        spell,
       });
       setJustSent(item.index);
       setTimeout(() => setJustSent((cur) => (cur === item.index ? null : cur)), 1800);
@@ -136,7 +144,7 @@ export function ConsumablesCatalogPanel({ token, refresh }: { token: string; ref
                   }
                   busy={busy === item.index}
                   sent={justSent === item.index}
-                  onAssign={(qty) => assign(item, qty)}
+                  onAssign={(qty, spell) => assign(item, qty, spell)}
                 />
               ))}
             </ul>
@@ -185,9 +193,12 @@ function CatalogRow({
   onToggle: () => void;
   busy: boolean;
   sent: boolean;
-  onAssign: (quantity: number) => void;
+  onAssign: (quantity: number, spell?: SpellPick) => void;
 }) {
   const [qty, setQty] = useState('1');
+  const [spell, setSpell] = useState<SpellPick | null>(null);
+  const isScroll = item.scrollLevel != null;
+  const canAssign = !busy && (!isScroll || !!spell);
 
   return (
     <li className="rounded-lg border border-ink-border bg-ink-raised">
@@ -206,6 +217,18 @@ function CatalogRow({
 
       {open && <p className="px-3 pb-2 text-xs text-parchment-dim">{item.summary}</p>}
 
+      {isScroll && (
+        <div className="border-t border-ink-border/60 px-3 py-2">
+          <p className="mb-1 text-xs text-parchment-dim">
+            Incantesimo della pergamena{' '}
+            <span className="text-ochre">
+              ({item.scrollLevel === 0 ? 'trucchetto' : `${item.scrollLevel}° livello`})
+            </span>
+          </p>
+          <ScrollSpellPicker level={item.scrollLevel!} selected={spell} onPick={setSpell} />
+        </div>
+      )}
+
       <div className="flex flex-wrap items-center gap-2 border-t border-ink-border/60 px-3 py-2">
         <label className="flex items-center gap-1 text-xs text-parchment-dim">
           Quantità
@@ -218,19 +241,77 @@ function CatalogRow({
         </label>
         <button
           type="button"
-          disabled={busy}
-          onClick={() => onAssign(Math.max(1, parseInt(qty, 10) || 1))}
+          disabled={!canAssign}
+          onClick={() => onAssign(Math.max(1, parseInt(qty, 10) || 1), spell ?? undefined)}
           className={cn(
             'ml-auto rounded-md px-3 py-1 text-sm font-medium',
             sent
               ? 'border border-gold text-gold'
               : 'bg-gold text-[color:var(--color-ink)] hover:brightness-110',
-            busy && 'opacity-50',
+            !canAssign && 'opacity-50',
           )}
         >
-          {sent ? '✓ Consegnato' : busy ? 'Assegno…' : 'Assegna al PG'}
+          {sent ? '✓ Consegnato' : busy ? 'Assegno…' : isScroll && !spell ? 'Scegli incantesimo' : 'Assegna al PG'}
         </button>
       </div>
     </li>
+  );
+}
+
+// Spell picker for a scroll: only spells of the scroll's exact level.
+function ScrollSpellPicker({
+  level,
+  selected,
+  onPick,
+}: {
+  level: number;
+  selected: SpellPick | null;
+  onPick: (s: SpellPick) => void;
+}) {
+  const [q, setQ] = useState('');
+  const [hits, setHits] = useState<SpellPick[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    const params = new URLSearchParams({ level: String(level) });
+    if (q.trim()) params.set('q', q.trim());
+    fetch(`/api/spells?${params.toString()}`)
+      .then((r) => r.json())
+      .then((d: SpellPick[]) => active && setHits(d.slice(0, 40)))
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [q, level]);
+
+  return (
+    <div>
+      <input
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        placeholder={selected ? `Scelto: ${selected.name}` : 'Cerca un incantesimo…'}
+        className="w-full rounded-md border border-ink-border bg-[color:var(--color-ink)] px-2 py-1.5 text-sm text-parchment placeholder:text-parchment-dim/60 focus:border-gold focus:outline-none"
+      />
+      <ul className="mt-1 max-h-40 overflow-y-auto rounded-md border border-ink-border">
+        {hits.map((h) => (
+          <li key={h.index}>
+            <button
+              type="button"
+              onClick={() => {
+                onPick(h);
+                setQ('');
+              }}
+              className={cn(
+                'flex w-full items-center justify-between px-2 py-1 text-left text-sm hover:bg-burgundy/30',
+                selected?.index === h.index ? 'text-gold' : 'text-parchment',
+              )}
+            >
+              <span>{h.name}</span>
+              {selected?.index === h.index && <span className="text-xs">✓</span>}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

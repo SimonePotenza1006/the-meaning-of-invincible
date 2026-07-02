@@ -372,6 +372,8 @@ export interface ConsumableAssignInput {
   description?: string;
   rarity?: string;
   quantity: number;
+  /** For spell scrolls: the (already localized) spell bound to the scroll. */
+  spell?: { index: string; name: string; level: number };
 }
 
 export async function assignConsumable(tok: string, input: ConsumableAssignInput) {
@@ -379,16 +381,25 @@ export async function assignConsumable(tok: string, input: ConsumableAssignInput
     tok,
     (s) => {
       const qty = Math.max(1, Math.min(99, Math.floor(input.quantity) || 1));
+      const bound = input.spell;
+      // A bound spell turns the item into a castable scroll (a `spell` effect
+      // is what the player-facing card renders as "Lancia").
+      const effects: MagicItemEffect[] = bound
+        ? [{ kind: 'spell', spellIndex: bound.index, spellName: bound.name, spellLevel: bound.level }]
+        : [];
+      const name = bound
+        ? `${input.name?.trim() || 'Pergamena'}: ${bound.name}`
+        : input.name?.trim() || 'Consumabile';
       const item: MagicItem = {
         id: crypto.randomUUID(),
-        name: input.name?.trim() || 'Consumabile',
+        name,
         description: input.description?.trim() || undefined,
         rarity: input.rarity || undefined,
         attunement: false,
         consumable: true,
         equipped: true,
         charges: { current: qty, max: qty },
-        effects: [],
+        effects,
       };
       s.equipment.magicItems.push(item);
       return {
