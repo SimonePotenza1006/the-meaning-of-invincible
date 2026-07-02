@@ -1,0 +1,546 @@
+[
+  {
+    "index": "oil-of-etherealness",
+    "name": "Oil of Etherealness",
+    "category": "Potion",
+    "rarity": "Rare",
+    "attunement": false,
+    "description": "Potion, rare\n\nBeads of this cloudy gray oil form on the outside of its container and quickly evaporate. The oil can cover a Medium or smaller creature, along with the equipment it's wearing and carrying (one additional vial is required for each size category above Medium). Applying the oil takes 10 minutes. The affected creature then gains the effect of the etherealness spell for 1 hour."
+  },
+  {
+    "index": "oil-of-sharpness",
+    "name": "Oil of Sharpness",
+    "category": "Potion",
+    "rarity": "Very Rare",
+    "attunement": false,
+    "description": "Potion, very rare\n\nThis clear, gelatinous oil sparkles with tiny, ultrathin silver shards. The oil can coat one slashing or piercing weapon or up to 5 pieces of slashing or piercing ammunition. Applying the oil takes 1 minute. For 1 hour, the coated item is magical and has a +3 bonus to attack and damage rolls."
+  },
+  {
+    "index": "oil-of-slipperiness",
+    "name": "Oil of Slipperiness",
+    "category": "Potion",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Potion, uncommon\n\nThis sticky black unguent is thick and heavy in the container, but it flows quickly when poured. The oil can cover a Medium or smaller creature, along with the equipment it's wearing and carrying (one additional vial is required for each size category above Medium). Applying the oil takes 10 minutes. The affected creature then gains the effect of a freedom of movement spell for 8 hours.\n\nAlternatively, the oil can be poured on the ground as an action, where it covers a 10-foot square, duplicating the effect of the grease spell in that area for 8 hours."
+  },
+  {
+    "index": "philter-of-love",
+    "name": "Philter of Love",
+    "category": "Potion",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Potion, uncommon\n\nThe next time you see a creature within 10 minutes after drinking this philter, you become charmed by that creature for 1 hour. If the creature is of a species and gender you are normally attracted to, you regard it as your true love while you are charmed. This potion's rose-hued, effervescent liquid contains one easy-to-miss bubble shaped like a heart."
+  },
+  {
+    "index": "potion-of-resistance-acid",
+    "name": "Potion of Acid Resistance",
+    "category": "Potion",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Potion, uncommon\n\nWhen you drink this potion, you gain resistance to acid damage for 1 hour."
+  },
+  {
+    "index": "potion-of-animal-friendship",
+    "name": "Potion of Animal Friendship",
+    "category": "Potion",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Potion, uncommon\n\nWhen you drink this potion, you can cast the animal friendship spell (save DC 13) for 1 hour at will. Agitating this muddy liquid brings little bits into view: a fish scale, a hummingbird tongue, a cat claw, or a squirrel hair."
+  },
+  {
+    "index": "potion-of-clairvoyance",
+    "name": "Potion of Clairvoyance",
+    "category": "Potion",
+    "rarity": "Rare",
+    "attunement": false,
+    "description": "Potion, rare\n\nWhen you drink this potion, you gain the effect of the clairvoyance spell. An eyeball bobs in this yellowish liquid but vanishes when the potion is opened."
+  },
+  {
+    "index": "potion-of-climbing",
+    "name": "Potion of Climbing",
+    "category": "Potion",
+    "rarity": "Common",
+    "attunement": false,
+    "description": "Potion, common\n\nWhen you drink this potion, you gain a climbing speed equal to your walking speed for 1 hour. During this time, you have advantage on Strength (Athletics) checks you make to climb. The potion is separated into brown, silver, and gray layers resembling bands of stone. Shaking the bottle fails to mix the colors."
+  },
+  {
+    "index": "potion-of-giant-strength-cloud",
+    "name": "Potion of Cloud Giant Strength",
+    "category": "Potion",
+    "rarity": "Very Rare",
+    "attunement": false,
+    "description": "Potion, very rare\n\nWhen you drink this potion, your Strength score changes to 27 for 1 hour. The potion has no effect on you if your Strength is equal to or greater than that score.\n\nThis potion's transparent liquid has floating in it a sliver of fingernail from a cloud giant."
+  },
+  {
+    "index": "potion-of-resistance-cold",
+    "name": "Potion of Cold Resistance",
+    "category": "Potion",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Potion, uncommon\n\nWhen you drink this potion, you gain resistance to cold damage for 1 hour."
+  },
+  {
+    "index": "potion-of-diminution",
+    "name": "Potion of Diminution",
+    "category": "Potion",
+    "rarity": "Rare",
+    "attunement": false,
+    "description": "Potion, rare\n\nWhen you drink this potion, you gain the \"reduce\" effect of the enlarge/reduce spell for 1d4 hours (no concentration required). The red in the potion's liquid continuously contracts to a tiny bead and then expands to color the clear liquid around it. Shaking the bottle fails to interrupt this process."
+  },
+  {
+    "index": "potion-of-giant-strength-fire",
+    "name": "Potion of Fire Giant Strength",
+    "category": "Potion",
+    "rarity": "Rare",
+    "attunement": false,
+    "description": "Potion, rare\n\nWhen you drink this potion, your Strength score changes to 25 for 1 hour. The potion has no effect on you if your Strength is equal to or greater than that score.\n\nThis potion's transparent liquid has floating in it a sliver of fingernail from a fire giant."
+  },
+  {
+    "index": "potion-of-resistance-fire",
+    "name": "Potion of Fire Resistance",
+    "category": "Potion",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Potion, uncommon\n\nWhen you drink this potion, you gain resistance to fire damage for 1 hour."
+  },
+  {
+    "index": "potion-of-flying",
+    "name": "Potion of Flying",
+    "category": "Potion",
+    "rarity": "Very Rare",
+    "attunement": false,
+    "description": "Potion, very rare\n\nWhen you drink this potion, you gain a flying speed equal to your walking speed for 1 hour and can hover. If you're in the air when the potion wears off, you fall unless you have some other means of staying aloft. This potion's clear liquid floats at the top of its container and has cloudy white impurities drifting in it."
+  },
+  {
+    "index": "potion-of-resistance-force",
+    "name": "Potion of Force Resistance",
+    "category": "Potion",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Potion, uncommon\n\nWhen you drink this potion, you gain resistance to force damage for 1 hour."
+  },
+  {
+    "index": "potion-of-giant-strength-frost",
+    "name": "Potion of Frost Giant Strength",
+    "category": "Potion",
+    "rarity": "Rare",
+    "attunement": false,
+    "description": "Potion, rare\n\nWhen you drink this potion, your Strength score changes to 23 for 1 hour. The potion has no effect on you if your Strength is equal to or greater than that score.\n\nThis potion's transparent liquid has floating in it a sliver of fingernail from a frost giant."
+  },
+  {
+    "index": "potion-of-gaseous-form",
+    "name": "Potion of Gaseous Form",
+    "category": "Potion",
+    "rarity": "Rare",
+    "attunement": false,
+    "description": "Potion, rare\n\nWhen you drink this potion, you gain the effect of the gaseous form spell for 1 hour (no concentration required) or until you end the effect as a bonus action. This potion's container seems to hold fog that moves and pours like water."
+  },
+  {
+    "index": "potion-of-healing-greater",
+    "name": "Potion of Greater Healing",
+    "category": "Potion",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Potion, uncommon\n\nYou regain 4d4 + 4 hit points when you drink this potion. The potion's red liquid glimmers when agitated."
+  },
+  {
+    "index": "potion-of-growth",
+    "name": "Potion of Growth",
+    "category": "Potion",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Potion, uncommon\n\nWhen you drink this potion, you gain the \"enlarge\" effect of the enlarge/reduce spell for 1d4 hours (no concentration required). The red in the potion's liquid continuously expands from a tiny bead to color the clear liquid around it and then contracts. Shaking the bottle fails to interrupt this process."
+  },
+  {
+    "index": "potion-of-healing-common",
+    "name": "Potion of Healing",
+    "category": "Potion",
+    "rarity": "Common",
+    "attunement": false,
+    "description": "Potion, common\n\nYou regain 2d4 + 2 hit points when you drink this potion. The potion's red liquid glimmers when agitated."
+  },
+  {
+    "index": "potion-of-heroism",
+    "name": "Potion of Heroism",
+    "category": "Potion",
+    "rarity": "Rare",
+    "attunement": false,
+    "description": "Potion, rare\n\nFor 1 hour after drinking it, you gain 10 temporary hit points that last for 1 hour. For the same duration, you are under the effect of the bless spell (no concentration required). This blue potion bubbles and steams as if boiling."
+  },
+  {
+    "index": "potion-of-giant-strength-hill",
+    "name": "Potion of Hill Giant Strength",
+    "category": "Potion",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Potion, uncommon\n\nWhen you drink this potion, your Strength score changes to 21 for 1 hour. The potion has no effect on you if your Strength is equal to or greater than that score.\n\nThis potion's transparent liquid has floating in it a sliver of fingernail from a hill giant."
+  },
+  {
+    "index": "potion-of-invisibility",
+    "name": "Potion of Invisibility",
+    "category": "Potion",
+    "rarity": "Very Rare",
+    "attunement": false,
+    "description": "Potion, very rare\n\nThis potion's container looks empty but feels as though it holds liquid. When you drink it, you become invisible for 1 hour. Anything you wear or carry is invisible with you. The effect ends early if you attack or cast a spell."
+  },
+  {
+    "index": "potion-of-resistance-lightning",
+    "name": "Potion of Lightning Resistance",
+    "category": "Potion",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Potion, uncommon\n\nWhen you drink this potion, you gain resistance to lightning damage for 1 hour."
+  },
+  {
+    "index": "potion-of-mind-reading",
+    "name": "Potion of Mind Reading",
+    "category": "Potion",
+    "rarity": "Rare",
+    "attunement": false,
+    "description": "Potion, rare\n\nWhen you drink this potion, you gain the effect of the detect thoughts spell (save DC 13). The potion's dense, purple liquid has an ovoid cloud of pink floating in it."
+  },
+  {
+    "index": "potion-of-resistance-necrotic",
+    "name": "Potion of Necrotic Resistance",
+    "category": "Potion",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Potion, uncommon\n\nWhen you drink this potion, you gain resistance to necrotic damage for 1 hour."
+  },
+  {
+    "index": "potion-of-poison",
+    "name": "Potion of Poison",
+    "category": "Potion",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Potion, uncommon\n\nThis concoction looks, smells, and tastes like a potion of healing or other beneficial potion. However, it is actually poison masked by illusion magic. An identify spell reveals its true nature.\n\nIf you drink it, you take 3d6 poison damage, and you must succeed on a DC 13 Constitution saving throw or be poisoned. At the start of each of your turns while you are poisoned in this way, you take 3d6 poison damage. At the end of each of your turns, you can repeat the saving throw. On a successful save, the poison damage you take on your subsequent turns decreases by 1d6. The poison ends when the damage decreases to 0."
+  },
+  {
+    "index": "potion-of-resistance-poison",
+    "name": "Potion of Poison Resistance",
+    "category": "Potion",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Potion, uncommon\n\nWhen you drink this potion, you gain resistance to poison damage for 1 hour."
+  },
+  {
+    "index": "potion-of-resistance-psychic",
+    "name": "Potion of Psychic Resistance",
+    "category": "Potion",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Potion, uncommon\n\nWhen you drink this potion, you gain resistance to psychic damage for 1 hour."
+  },
+  {
+    "index": "potion-of-resistance-radiant",
+    "name": "Potion of Radiant Resistance",
+    "category": "Potion",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Potion, uncommon\n\nWhen you drink this potion, you gain resistance to radiant damage for 1 hour."
+  },
+  {
+    "index": "potion-of-speed",
+    "name": "Potion of Speed",
+    "category": "Potion",
+    "rarity": "Very Rare",
+    "attunement": false,
+    "description": "Potion, very rare\n\nWhen you drink this potion, you gain the effect of the haste spell for 1 minute (no concentration required). The potion's yellow fluid is streaked with black and swirls on its own."
+  },
+  {
+    "index": "potion-of-giant-strength-stone",
+    "name": "Potion of Stone Giant Strength",
+    "category": "Potion",
+    "rarity": "Rare",
+    "attunement": false,
+    "description": "Potion, rare\n\nWhen you drink this potion, your Strength score changes to 23 for 1 hour. The potion has no effect on you if your Strength is equal to or greater than that score.\n\nThis potion's transparent liquid has floating in it a sliver of fingernail from a stone giant."
+  },
+  {
+    "index": "potion-of-giant-strength-storm",
+    "name": "Potion of Storm Giant Strength",
+    "category": "Potion",
+    "rarity": "Legendary",
+    "attunement": false,
+    "description": "Potion, legendary\n\nWhen you drink this potion, your Strength score changes to 29 for 1 hour. The potion has no effect on you if your Strength is equal to or greater than that score.\n\nThis potion's transparent liquid has floating in it a sliver of fingernail from a storm giant."
+  },
+  {
+    "index": "potion-of-healing-superior",
+    "name": "Potion of Superior Healing",
+    "category": "Potion",
+    "rarity": "Rare",
+    "attunement": false,
+    "description": "Potion, rare\n\nYou regain 8d4 + 8 hit points when you drink this potion. The potion's red liquid glimmers when agitated."
+  },
+  {
+    "index": "potion-of-healing-supreme",
+    "name": "Potion of Supreme Healing",
+    "category": "Potion",
+    "rarity": "Very Rare",
+    "attunement": false,
+    "description": "Potion, very rare\n\nYou regain 10d4 + 20 hit points when you drink this potion. The potion's red liquid glimmers when agitated."
+  },
+  {
+    "index": "potion-of-resistance-thunder",
+    "name": "Potion of Thunder Resistance",
+    "category": "Potion",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Potion, uncommon\n\nWhen you drink this potion, you gain resistance to thunder damage for 1 hour."
+  },
+  {
+    "index": "potion-of-water-breathing",
+    "name": "Potion of Water Breathing",
+    "category": "Potion",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Potion, uncommon\n\nYou can breathe underwater for 1 hour after drinking this potion. Its cloudy green fluid smells of the sea and has a jellyfish-like bubble floating in it."
+  },
+  {
+    "index": "spell-scroll-1st",
+    "name": "Spell Scroll (1st)",
+    "category": "Scroll",
+    "rarity": "Common",
+    "attunement": false,
+    "description": "Scroll, common\n\nA spell scroll bears the words of a single spell, written in a mystical cipher. If the spell is on your class's spell list, you can read the scroll and cast its spell without providing any material components. Otherwise, the scroll is unintelligible. Casting the spell by reading the scroll requires the spell's normal casting time. Once the spell is cast, the words on the scroll fade, and it crumbles to dust. If the casting is uninterrupted, the scroll is not lost.\n\nIf the spell is on your class's spell list but of a higher level than you can normally cast, you must make an ability check using your spellcasting ability to determine whether you cast it successfully. The DC equals 10 + the spell's level. On a failed check, the spell disappears from the scroll with no other effect.\n\nThis scroll contains a 1st level spell. The spell's saving throw is 13 and the attack bonus is +5.\n\nA wizard spell on a spell scroll can be copied just as spells in spellbooks can be copied. When a spell is copied from a spell scroll, the copier must succeed on an Intelligence (Arcana) check with a DC equal to 11. If the check succeeds, the spell is successfully copied. Whether the check succeeds or fails, the spell scroll is destroyed."
+  },
+  {
+    "index": "spell-scroll-2nd",
+    "name": "Spell Scroll (2nd)",
+    "category": "Scroll",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Scroll, uncommon\n\nA spell scroll bears the words of a single spell, written in a mystical cipher. If the spell is on your class's spell list, you can read the scroll and cast its spell without providing any material components. Otherwise, the scroll is unintelligible. Casting the spell by reading the scroll requires the spell's normal casting time. Once the spell is cast, the words on the scroll fade, and it crumbles to dust. If the casting is uninterrupted, the scroll is not lost.\n\nIf the spell is on your class's spell list but of a higher level than you can normally cast, you must make an ability check using your spellcasting ability to determine whether you cast it successfully. The DC equals 10 + the spell's level. On a failed check, the spell disappears from the scroll with no other effect.\n\nThis scroll contains a 2nd level spell. The spell's saving throw is 13 and the attack bonus is +5.\n\nA wizard spell on a spell scroll can be copied just as spells in spellbooks can be copied. When a spell is copied from a spell scroll, the copier must succeed on an Intelligence (Arcana) check with a DC equal to 12. If the check succeeds, the spell is successfully copied. Whether the check succeeds or fails, the spell scroll is destroyed."
+  },
+  {
+    "index": "spell-scroll-3rd",
+    "name": "Spell Scroll (3rd)",
+    "category": "Scroll",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Scroll, uncommon\n\nA spell scroll bears the words of a single spell, written in a mystical cipher. If the spell is on your class's spell list, you can read the scroll and cast its spell without providing any material components. Otherwise, the scroll is unintelligible. Casting the spell by reading the scroll requires the spell's normal casting time. Once the spell is cast, the words on the scroll fade, and it crumbles to dust. If the casting is uninterrupted, the scroll is not lost.\n\nIf the spell is on your class's spell list but of a higher level than you can normally cast, you must make an ability check using your spellcasting ability to determine whether you cast it successfully. The DC equals 10 + the spell's level. On a failed check, the spell disappears from the scroll with no other effect.\n\nThis scroll contains a 3rd level spell. The spell's saving throw is 15 and the attack bonus is +7.\n\nA wizard spell on a spell scroll can be copied just as spells in spellbooks can be copied. When a spell is copied from a spell scroll, the copier must succeed on an Intelligence (Arcana) check with a DC equal to 13. If the check succeeds, the spell is successfully copied. Whether the check succeeds or fails, the spell scroll is destroyed."
+  },
+  {
+    "index": "spell-scroll-4th",
+    "name": "Spell Scroll (4th)",
+    "category": "Scroll",
+    "rarity": "Rare",
+    "attunement": false,
+    "description": "Scroll, rare\n\nA spell scroll bears the words of a single spell, written in a mystical cipher. If the spell is on your class's spell list, you can read the scroll and cast its spell without providing any material components. Otherwise, the scroll is unintelligible. Casting the spell by reading the scroll requires the spell's normal casting time. Once the spell is cast, the words on the scroll fade, and it crumbles to dust. If the casting is uninterrupted, the scroll is not lost.\n\nIf the spell is on your class's spell list but of a higher level than you can normally cast, you must make an ability check using your spellcasting ability to determine whether you cast it successfully. The DC equals 10 + the spell's level. On a failed check, the spell disappears from the scroll with no other effect.\n\nThis scroll contains a 4th level spell. The spell's saving throw is 15 and the attack bonus is +7.\n\nA wizard spell on a spell scroll can be copied just as spells in spellbooks can be copied. When a spell is copied from a spell scroll, the copier must succeed on an Intelligence (Arcana) check with a DC equal to 14. If the check succeeds, the spell is successfully copied. Whether the check succeeds or fails, the spell scroll is destroyed."
+  },
+  {
+    "index": "spell-scroll-5th",
+    "name": "Spell Scroll (5th)",
+    "category": "Scroll",
+    "rarity": "Rare",
+    "attunement": false,
+    "description": "Scroll, rare\n\nA spell scroll bears the words of a single spell, written in a mystical cipher. If the spell is on your class's spell list, you can read the scroll and cast its spell without providing any material components. Otherwise, the scroll is unintelligible. Casting the spell by reading the scroll requires the spell's normal casting time. Once the spell is cast, the words on the scroll fade, and it crumbles to dust. If the casting is uninterrupted, the scroll is not lost.\n\nIf the spell is on your class's spell list but of a higher level than you can normally cast, you must make an ability check using your spellcasting ability to determine whether you cast it successfully. The DC equals 10 + the spell's level. On a failed check, the spell disappears from the scroll with no other effect.\n\nThis scroll contains a 5th level spell. The spell's saving throw is 17 and the attack bonus is +9.\n\nA wizard spell on a spell scroll can be copied just as spells in spellbooks can be copied. When a spell is copied from a spell scroll, the copier must succeed on an Intelligence (Arcana) check with a DC equal to 15. If the check succeeds, the spell is successfully copied. Whether the check succeeds or fails, the spell scroll is destroyed."
+  },
+  {
+    "index": "spell-scroll-6th",
+    "name": "Spell Scroll (6th)",
+    "category": "Scroll",
+    "rarity": "Very Rare",
+    "attunement": false,
+    "description": "Scroll, very rare\n\nA spell scroll bears the words of a single spell, written in a mystical cipher. If the spell is on your class's spell list, you can read the scroll and cast its spell without providing any material components. Otherwise, the scroll is unintelligible. Casting the spell by reading the scroll requires the spell's normal casting time. Once the spell is cast, the words on the scroll fade, and it crumbles to dust. If the casting is uninterrupted, the scroll is not lost.\n\nIf the spell is on your class's spell list but of a higher level than you can normally cast, you must make an ability check using your spellcasting ability to determine whether you cast it successfully. The DC equals 10 + the spell's level. On a failed check, the spell disappears from the scroll with no other effect.\n\nThis scroll contains a 6th level spell. The spell's saving throw is 18 and the attack bonus is +10.\n\nA wizard spell on a spell scroll can be copied just as spells in spellbooks can be copied. When a spell is copied from a spell scroll, the copier must succeed on an Intelligence (Arcana) check with a DC equal to 16. If the check succeeds, the spell is successfully copied. Whether the check succeeds or fails, the spell scroll is destroyed."
+  },
+  {
+    "index": "spell-scroll-7th",
+    "name": "Spell Scroll (7th)",
+    "category": "Scroll",
+    "rarity": "Very Rare",
+    "attunement": false,
+    "description": "Scroll, very rare\n\nA spell scroll bears the words of a single spell, written in a mystical cipher. If the spell is on your class's spell list, you can read the scroll and cast its spell without providing any material components. Otherwise, the scroll is unintelligible. Casting the spell by reading the scroll requires the spell's normal casting time. Once the spell is cast, the words on the scroll fade, and it crumbles to dust. If the casting is uninterrupted, the scroll is not lost.\n\nIf the spell is on your class's spell list but of a higher level than you can normally cast, you must make an ability check using your spellcasting ability to determine whether you cast it successfully. The DC equals 10 + the spell's level. On a failed check, the spell disappears from the scroll with no other effect.\n\nThis scroll contains a 7th level spell. The spell's saving throw is 18 and the attack bonus is +10.\n\nA wizard spell on a spell scroll can be copied just as spells in spellbooks can be copied. When a spell is copied from a spell scroll, the copier must succeed on an Intelligence (Arcana) check with a DC equal to 17. If the check succeeds, the spell is successfully copied. Whether the check succeeds or fails, the spell scroll is destroyed."
+  },
+  {
+    "index": "spell-scroll-8th",
+    "name": "Spell Scroll (8th)",
+    "category": "Scroll",
+    "rarity": "Very Rare",
+    "attunement": false,
+    "description": "Scroll, very rare\n\nA spell scroll bears the words of a single spell, written in a mystical cipher. If the spell is on your class's spell list, you can read the scroll and cast its spell without providing any material components. Otherwise, the scroll is unintelligible. Casting the spell by reading the scroll requires the spell's normal casting time. Once the spell is cast, the words on the scroll fade, and it crumbles to dust. If the casting is uninterrupted, the scroll is not lost.\n\nIf the spell is on your class's spell list but of a higher level than you can normally cast, you must make an ability check using your spellcasting ability to determine whether you cast it successfully. The DC equals 10 + the spell's level. On a failed check, the spell disappears from the scroll with no other effect.\n\nThis scroll contains an 8th level spell. The spell's saving throw is 18 and the attack bonus is +10.\n\nA wizard spell on a spell scroll can be copied just as spells in spellbooks can be copied. When a spell is copied from a spell scroll, the copier must succeed on an Intelligence (Arcana) check with a DC equal to 18. If the check succeeds, the spell is successfully copied. Whether the check succeeds or fails, the spell scroll is destroyed."
+  },
+  {
+    "index": "spell-scroll-9th",
+    "name": "Spell Scroll (9th)",
+    "category": "Scroll",
+    "rarity": "Legendary",
+    "attunement": false,
+    "description": "Scroll, legendary\n\nA spell scroll bears the words of a single spell, written in a mystical cipher. If the spell is on your class's spell list, you can read the scroll and cast its spell without providing any material components. Otherwise, the scroll is unintelligible. Casting the spell by reading the scroll requires the spell's normal casting time. Once the spell is cast, the words on the scroll fade, and it crumbles to dust. If the casting is uninterrupted, the scroll is not lost.\n\nIf the spell is on your class's spell list but of a higher level than you can normally cast, you must make an ability check using your spellcasting ability to determine whether you cast it successfully. The DC equals 10 + the spell's level. On a failed check, the spell disappears from the scroll with no other effect.\n\nThis scroll contains a 9th level spell. The spell's saving throw is 19 and the attack bonus is +11.\n\nA wizard spell on a spell scroll can be copied just as spells in spellbooks can be copied. When a spell is copied from a spell scroll, the copier must succeed on an Intelligence (Arcana) check with a DC equal to 19. If the check succeeds, the spell is successfully copied. Whether the check succeeds or fails, the spell scroll is destroyed."
+  },
+  {
+    "index": "spell-scroll-cantrip",
+    "name": "Spell Scroll (Cantrip)",
+    "category": "Scroll",
+    "rarity": "Common",
+    "attunement": false,
+    "description": "Scroll, common\n\nA spell scroll bears the words of a single spell, written in a mystical cipher. If the spell is on your class's spell list, you can read the scroll and cast its spell without providing any material components. Otherwise, the scroll is unintelligible. Casting the spell by reading the scroll requires the spell's normal casting time. Once the spell is cast, the words on the scroll fade, and it crumbles to dust. If the casting is uninterrupted, the scroll is not lost.\n\nIf the spell is on your class's spell list but of a higher level than you can normally cast, you must make an ability check using your spellcasting ability to determine whether you cast it successfully. The DC equals 10 + the spell's level. On a failed check, the spell disappears from the scroll with no other effect.\n\nThis scroll contains a cantrip. The spell's saving throw is 13 and the attack bonus is +5."
+  },
+  {
+    "index": "ammunition-1",
+    "name": "Ammunition, +1",
+    "category": "Ammunition",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Weapon (any ammunition), uncommon\n\nYou have a +1 bonus to attack and damage rolls made with this piece of magic ammunition. Once it hits a target, the ammunition is no longer magical."
+  },
+  {
+    "index": "ammunition-2",
+    "name": "Ammunition, +2",
+    "category": "Ammunition",
+    "rarity": "Rare",
+    "attunement": false,
+    "description": "Weapon (any ammunition), rare\n\nYou have a +2 bonus to attack and damage rolls made with this piece of magic ammunition. Once it hits a target, the ammunition is no longer magical."
+  },
+  {
+    "index": "ammunition-3",
+    "name": "Ammunition, +3",
+    "category": "Ammunition",
+    "rarity": "Very Rare",
+    "attunement": false,
+    "description": "Weapon (any ammunition), very rare\n\nYou have a +3 bonus to attack and damage rolls made with this piece of magic ammunition. Once it hits a target, the ammunition is no longer magical."
+  },
+  {
+    "index": "arrow-of-slaying",
+    "name": "Arrow of Slaying",
+    "category": "Ammunition",
+    "rarity": "Very Rare",
+    "attunement": false,
+    "description": "Weapon (arrow), very rare\n\nAn arrow of slaying is a magic weapon meant to slay a particular kind of creature. Some are more focused than others; for example, there are both arrows of dragon slaying and arrows of blue dragon slaying. If a creature belonging to the type, race, or group associated with an arrow of slaying takes damage from the arrow, the creature must make a DC 17 Constitution saving throw, taking an extra 6d10 piercing damage on a failed save, or half as much extra damage on a successful one.\n\nOnce an arrow of slaying deals its extra damage to a creature, it becomes a nonmagical arrow.\n\nOther types of magic ammunition of this kind exist, such as bolts of slaying meant for a crossbow, though arrows are most common."
+  },
+  {
+    "index": "elemental-gem-air",
+    "name": "Air Elemental Gem",
+    "category": "Wondrous Items",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Wondrous item, uncommon\n\nThis blue sapphire contains a mote of elemental energy. When you use an action to break the gem, an air elemental is summoned as if you had cast the conjure elemental spell, and the gem's magic is lost."
+  },
+  {
+    "index": "feather-token-anchor",
+    "name": "Anchor Feather Token",
+    "category": "Wondrous Items",
+    "rarity": "Rare",
+    "attunement": false,
+    "description": "Wondrous item, rare\n\nThis tiny object looks like a feather.\n\nYou can use an action to touch the token to a boat or ship. For the next 24 hours, the vessel can't be moved by any means. Touching the token to the vessel again ends the effect. When the effect ends, the token disappears."
+  },
+  {
+    "index": "bag-of-beans",
+    "name": "Bag of Beans",
+    "category": "Wondrous Items",
+    "rarity": "Rare",
+    "attunement": false,
+    "description": "Wondrous item, rare\n\nInside this heavy cloth bag are 3d4 dry beans. The bag weighs 1/2 pound plus 1/4 pound for each bean it contains.\n\nIf you dump the bag's contents out on the ground,  they explode in a 10-foot radius, extending from the beans. Each creature in the area, including you, must  make a DC 15 Dexterity saving throw, taking 5d4 fire  damage on a failed save, or half as much damage on  a successful one. The fire ignites flammable objects  in the area that aren't being worn or carried.\n\nIf you remove a bean from the bag, plant it in dirt  or sand, and then water it, the bean produces an  effect 1 minute later from the ground where it was  planted. The GM can choose an effect from the  following table, determine it randomly, or create an  effect.\n\n| d100 | Effect |\n\n|---|---|\n\n| 01 | 5d4 toadstools sprout. If a creature eats a toadstool, roll any die. On an odd roll, the eater must succeed on a DC 15 Constitution saving throw or take 5d6 poison damage and become poisoned for 1 hour. On an even roll, the eater gains 5d6 temporary hit points for 1 hour. |\n\n| 02-10 | A geyser erupts and spouts water, beer, berry juice, tea, vinegar, wine, or oil (GM's choice) 30 feet into the air for 1d12 rounds. |\n\n| 11-20 | A treant sprouts. There's a 50 percent chance that the treant is chaotic evil and attacks. |\n\n| 21-30 | An animate, immobile stone statue in your likeness rises. It makes verbal threats against you. If you leave it and others come near, it describes you as the most heinous of villains and directs the newcomers to find and attack you. If you are on the same plane of existence as the statue, it knows where you are. The statue becomes inanimate after 24 hours. |\n\n| 31-40 | A campfire with blue flames springs forth and burns for 24 hours (or until it is extinguished). |\n\n| 41-50 | 1d6 + 6 shriekers sprout |\n\n| 51-60 | 1d4 + 8 bright pink toads crawl forth. Whenever a toad is touched, it transforms into a Large or smaller monster of the GM's choice. The monster remains for 1 minute, then disappears in a puff of bright pink smoke. |\n\n| 61-70 | A hungry bulette burrows up and attacks. |\n\n| 71-80 | A fruit tree grows. It has 1d10 + 20 fruit, 1d8 of which act as randomly determined magic potions, while one acts as an ingested poison of the GM's choice. The tree vanishes after 1 hour. Picked fruit remains, retaining any magic for 30 days. |\n\n| 81-90 | A nest of 1d4 + 3 eggs springs up. Any creature that eats an egg must make a DC 20 Constitution saving throw. On a successful save, a creature permanently increases its lowest ability score by 1, randomly choosing among equally low scores. On a failed save, the creature takes 10d6 force damage from an internal magical explosion. |\n\n| 91-99 | A pyramid with a 60-foot-square base bursts upward. Inside is a sarcophagus containing a mummy lord. The pyramid is treated as the mummy lord's lair, and its sarcophagus contains treasure of the GM's choice. |\n\n| 100 | A giant beanstalk sprouts, growing to a height of the GM's choice. The top leads where the GM chooses, such as to a great view, a cloud giant's castle, or a different plane of existence. |"
+  },
+  {
+    "index": "bead-of-force",
+    "name": "Bead of Force",
+    "category": "Wondrous Items",
+    "rarity": "Rare",
+    "attunement": false,
+    "description": "Wondrous item, rare\n\nThis small black Sphere measures 3/4 of an inch in diameter and weighs an ounce. Typically, 1d4 + 4 beads of force are found together.\n\nYou can use an action to throw the bead up to 60 feet. The bead explodes on impact and is destroyed. Each creature within a 10-foot radius of where the bead landed must succeed on a DC 15 Dexterity saving throw or take 5d4 force damage. A Sphere of transparent force then encloses the area for 1 minute. Any creature that failed the save and is completely within the area is trapped inside this Sphere. Creatures that succeeded on the save, or are partially within the area, are pushed away from the center of the Sphere until they are no longer inside it. Only breathable air can pass through the sphere's wall. No Attack or other Effect can.\n\nAn enclosed creature can use its action to push against the sphere's wall, moving the Sphere up to half the creature's walking speed. The Sphere can be picked up, and its magic causes it to weigh only 1 pound, regardless of the weight of creatures inside."
+  },
+  {
+    "index": "feather-token-bird",
+    "name": "Bird Feather Token",
+    "category": "Wondrous Items",
+    "rarity": "Rare",
+    "attunement": false,
+    "description": "Wondrous item, rare\n\nThis tiny object looks like a feather.\n\nYou can use an action to toss the token 5 feet into the air. The token disappears and an enormous, multicolored bird takes its place. The bird has the statistics of a roc, but it obeys your simple commands and can't attack. It can carry up to 500 pounds while flying at its maximum speed (16 miles an hour for a maximum of 144 miles per day, with a one-hour rest for every 3 hours of flying), or 1,000 pounds at half that speed. The bird disappears after flying its maximum distance for a day or if it drops to 0 hit points. You can dismiss the bird as an action."
+  },
+  {
+    "index": "dust-of-disappearance",
+    "name": "Dust of Disappearance",
+    "category": "Wondrous Items",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Wondrous item, uncommon\n\nFound in a small packet, this powder resembles very fine sand. There is enough of it for one use. When you use an action to throw the dust into the air, you and each creature and object within 10 feet of you become invisible for 2d4 minutes. The duration is the same for all subjects, and the dust is consumed when its magic takes effect. If a creature affected by the dust attacks or casts a spell, the invisibility ends for that creature."
+  },
+  {
+    "index": "dust-of-dryness",
+    "name": "Dust of Dryness",
+    "category": "Wondrous Items",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Wondrous item, uncommon\n\nThis small packet contains 1d6 + 4 pinches of dust. You can use an action to sprinkle a pinch of it over water. The dust turns a cube of water 15 feet on a side into one marble-sized pellet, which floats or rests near where the dust was sprinkled. The pellet's weight is negligible.\n\nSomeone can use an action to smash the pellet against a hard surface, causing the pellet to shatter and release the water the dust absorbed. Doing so ends that pellet's magic.\n\nAn elemental composed mostly of water that is exposed to a pinch of the dust must make a DC 13 Constitution saving throw, taking 10d6 necrotic damage on a failed save, or half as much damage on a successful one."
+  },
+  {
+    "index": "dust-of-sneezing-and-choking",
+    "name": "Dust of Sneezing and Choking",
+    "category": "Wondrous Items",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Wondrous item, uncommon\n\nFound in a small container, this powder resembles very fine sand. It appears to be dust of disappearance, and an identify spell reveals it to be such. There is enough of it for one use.\n\nWhen you use an action to throw a handful of the dust into the air, you and each creature that needs to breathe within 30 feet of you must succeed on a DC 15 Constitution saving throw or become unable to breathe, while sneezing uncontrollably. A creature affected in this way is incapacitated and suffocating. As long as it is conscious, a creature can repeat the saving throw at the end of each of its turns, ending the effect on it on a success. The lesser restoration spell can also end the effect on a creature."
+  },
+  {
+    "index": "elemental-gem-earth",
+    "name": "Earth Elemental Gem",
+    "category": "Wondrous Items",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Wondrous item, uncommon\n\nThis yellow diamond contains a mote of elemental energy. When you use an action to break the gem, an earth elemental is summoned as if you had cast the conjure elemental spell, and the gem's magic is lost."
+  },
+  {
+    "index": "feather-token-fan",
+    "name": "Fan Feather Token",
+    "category": "Wondrous Items",
+    "rarity": "Rare",
+    "attunement": false,
+    "description": "Wondrous item, rare\n\nThis tiny object looks like a feather.\n\nIf you are on a boat or ship, you can use an action to toss the token up to 10 feet in the air. The token disappears, and a giant flapping fan takes its place. The fan floats and creates a wind strong enough to fill the sails of one ship, increasing its speed by 5 miles per hour for 8 hours. You can dismiss the fan as an action."
+  },
+  {
+    "index": "elemental-gem-fire",
+    "name": "Fire Elemental Gem",
+    "category": "Wondrous Items",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Wondrous item, uncommon\n\nThis red corundum contains a mote of elemental energy. When you use an action to break the gem, a fire elemental is summoned as if you had cast the conjure elemental spell, and the gem's magic is lost."
+  },
+  {
+    "index": "restorative-ointment",
+    "name": "Restorative Ointment",
+    "category": "Wondrous Items",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Wondrous item, uncommon\n\nThis glass jar, 3 inches in diameter, contains 1d4 + 1 doses of a thick mixture that smells faintly of aloe. The jar and its contents weigh 1/2 pound.\n\nAs an action, one dose of the ointment can be swallowed or applied to the skin. The creature that receives it regains 2d8 + 2 hit points, ceases to be poisoned, and is cured of any disease."
+  },
+  {
+    "index": "feather-token-swan-boat",
+    "name": "Swan Boat Feather Token",
+    "category": "Wondrous Items",
+    "rarity": "Rare",
+    "attunement": false,
+    "description": "Wondrous item, rare\n\nThis tiny object looks like a feather.\n\nYou can use an action to touch the token to a body of water at least 60 feet in diameter. The token disappears, and a 50-foot-long, 20-foot wide boat shaped like a swan takes its place. The boat is self-propelled and moves across water at a speed of 6 miles per hour. You can use an action while on the boat to command it to move or to turn up to 90 degrees. The boat can carry up to thirty-two Medium or smaller creatures. A Large creature counts as four Medium creatures, while a Huge creature counts as nine. The boat remains for 24 hours and then disappears. You can dismiss the boat as an action."
+  },
+  {
+    "index": "feather-token-tree",
+    "name": "Tree Feather Token",
+    "category": "Wondrous Items",
+    "rarity": "Rare",
+    "attunement": false,
+    "description": "Wondrous item, rare\n\nThis tiny object looks like a feather.\n\nYou must be outdoors to use this token. You can use an action to touch it to an unoccupied space on the ground. The token disappears, and in its place a nonmagical oak tree springs into existence. The tree is 60 feet tall and has a 5-foot-diameter trunk, and its branches at the top spread out in a 20-foot radius."
+  },
+  {
+    "index": "universal-solvent",
+    "name": "Universal Solvent",
+    "category": "Wondrous Items",
+    "rarity": "Legendary",
+    "attunement": false,
+    "description": "Wondrous item, legendary\n\nThis tube holds milky liquid with a strong alcohol smell. You can use an action to pour the contents of the tube onto a surface within reach. The liquid instantly dissolves up to 1 square foot of adhesive it touches, including sovereign glue."
+  },
+  {
+    "index": "elemental-gem-water",
+    "name": "Water Elemental Gem",
+    "category": "Wondrous Items",
+    "rarity": "Uncommon",
+    "attunement": false,
+    "description": "Wondrous item, uncommon\n\nThis emerald contains a mote of elemental energy. When you use an action to break the gem, a water elemental is summoned as if you had cast the conjure elemental spell, and the gem's magic is lost."
+  },
+  {
+    "index": "feather-token-whip",
+    "name": "Whip Feather Token",
+    "category": "Wondrous Items",
+    "rarity": "Rare",
+    "attunement": false,
+    "description": "Wondrous item, rare\n\nThis tiny object looks like a feather.\n\nYou can use an action to throw the token to a point within 10 feet of you. The token disappears, and a floating whip takes its place. You can then use a bonus action to make a melee spell attack against a creature within 10 feet of the whip, with an attack bonus of +9. On a hit, the target takes 1d6 + 5 force damage.\n\nAs a bonus action on your turn, you can direct the whip to fly up to 20 feet and repeat the attack against a creature within 10 feet of it. The whip disappears after 1 hour, when you use an action to dismiss it, or when you are incapacitated or die."
+  }
+]

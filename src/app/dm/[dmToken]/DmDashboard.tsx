@@ -7,6 +7,8 @@ import {
   GiCrossedSwords,
   GiDiceTwentyFacesTwenty,
   GiNotebook,
+  GiOpenBook,
+  GiPotionBall,
   GiScrollUnfurled,
   GiSkullCrossedBones,
   GiSpellBook,
@@ -34,6 +36,8 @@ import { CombatPanel } from '@/components/combat/CombatPanel';
 import { AttacksPanel } from '@/components/AttacksPanel';
 import { SpellsPanel } from '@/components/SpellsPanel';
 import { MagicItemsPanel } from '@/components/MagicItemsPanel';
+import { SpellCompendiumPanel } from '@/components/SpellCompendiumPanel';
+import { ConsumablesCatalogPanel } from '@/components/ConsumablesCatalogPanel';
 import { NotesPanel } from '@/components/NotesPanel';
 import { NpcPanel } from '@/components/NpcPanel';
 import type { CampaignState } from '@/lib/game/repo';
@@ -370,10 +374,22 @@ export function DmDashboard({ token, initial }: { token: string; initial: Campai
       content: <SpellsPanel token={token} sheet={sheet} refresh={refresh} />,
     },
     {
+      id: 'compendio',
+      label: 'Compendio',
+      icon: <GiOpenBook />,
+      content: <SpellCompendiumPanel />,
+    },
+    {
       id: 'oggetti',
       label: 'Oggetti',
       icon: <GiSwapBag />,
       content: <MagicItemsPanel token={token} sheet={sheet} refresh={refresh} canCreate />,
+    },
+    {
+      id: 'consumabili',
+      label: 'Consumabili',
+      icon: <GiPotionBall />,
+      content: <ConsumablesCatalogPanel token={token} refresh={refresh} />,
     },
     { id: 'stati', label: 'Stati', icon: <GiSkullCrossedBones />, content: stati },
     {

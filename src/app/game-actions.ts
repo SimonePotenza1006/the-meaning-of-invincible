@@ -363,6 +363,44 @@ export async function addMagicItem(tok: string, input: MagicItemInput) {
   );
 }
 
+// Assign a catalogue consumable (potion/scroll/…) straight onto the sheet as a
+// consumable magic item. `quantity` seeds the charges (which act as a count);
+// the player spends them via useMagicItem and the item vanishes at 0.
+export interface ConsumableAssignInput {
+  index: string;
+  name: string;
+  description?: string;
+  rarity?: string;
+  quantity: number;
+}
+
+export async function assignConsumable(tok: string, input: ConsumableAssignInput) {
+  return mutate(
+    tok,
+    (s) => {
+      const qty = Math.max(1, Math.min(99, Math.floor(input.quantity) || 1));
+      const item: MagicItem = {
+        id: crypto.randomUUID(),
+        name: input.name?.trim() || 'Consumabile',
+        description: input.description?.trim() || undefined,
+        rarity: input.rarity || undefined,
+        attunement: false,
+        consumable: true,
+        equipped: true,
+        charges: { current: qty, max: qty },
+        effects: [],
+      };
+      s.equipment.magicItems.push(item);
+      return {
+        kind: 'item',
+        actor: 'dm',
+        message: `Consegnato al PG: ${item.name}${qty > 1 ? ` ×${qty}` : ''}.`,
+      };
+    },
+    { dmOnly: true },
+  );
+}
+
 export async function removeMagicItem(tok: string, id: string) {
   return mutate(
     tok,
