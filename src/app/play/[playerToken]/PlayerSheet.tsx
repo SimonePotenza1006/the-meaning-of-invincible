@@ -34,6 +34,7 @@ import { SpellsPanel } from '@/components/SpellsPanel';
 import { MagicItemsPanel } from '@/components/MagicItemsPanel';
 import { NotesPanel } from '@/components/NotesPanel';
 import { RollRequestDialog } from '@/components/RollRequestDialog';
+import { OmenLayer } from '@/components/OmenLayer';
 import type { CampaignState } from '@/lib/game/repo';
 
 const DICE = ['d20', 'd12', 'd10', 'd8', 'd6', 'd4'];
@@ -342,6 +343,9 @@ export function PlayerSheet({ token, initial }: { token: string; initial: Campai
 
   return (
     <>
+      {/* Omens the DM pushes to this screen (voices, mark, blackout, watched). */}
+      <OmenLayer events={state.events} />
+
       {/* Non-dismissable dialogs — overlay any section. Level-up takes priority. */}
       {sheet.pendingLevelUp ? (
         <LevelUpPanel token={token} sheet={sheet} refresh={refresh} />

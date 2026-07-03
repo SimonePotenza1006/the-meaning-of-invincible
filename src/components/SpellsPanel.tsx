@@ -11,6 +11,7 @@ import {
   togglePreparedSpell,
   updateSpellSlot,
 } from '@/app/game-actions';
+import { castWildMagic } from '@/lib/game/wild-magic';
 import { Panel, cn } from '@/app/crea/ui';
 import { StatTile, Stepper } from '@/components/game';
 import { ActionGlyph, ActionLegend } from '@/components/action-cost';
@@ -65,6 +66,16 @@ export function SpellsPanel({
     }
   };
 
+  // Casting a leveled spell (not a cantrip) answers with a Wild Magic surge on
+  // the Wilder table: the sorceress's chaos reacts to every real spell.
+  const cast = (sp: KnownSpell) =>
+    run(
+      (async () => {
+        await castSpell(token, sp);
+        if (sp.level >= 1) await castWildMagic(token, { source: `Lancio di ${sp.name}` });
+      })(),
+    );
+
   const knownSorted = [...sc.known].sort((a, b) => a.level - b.level || a.name.localeCompare(b.name, 'it'));
   const knownCount = isPrepared ? preparedSet.size : sc.known.length;
 
@@ -113,7 +124,7 @@ export function SpellsPanel({
                 key={sp.index}
                 spell={sp}
                 canCast
-                onCast={() => run(castSpell(token, sp))}
+                onCast={() => cast(sp)}
                 onForget={() => run(forgetSpell(token, sp.index))}
               />
             ))}
@@ -138,7 +149,7 @@ export function SpellsPanel({
                   canCast={canCast}
                   prepared={isPrepared ? prep : undefined}
                   onTogglePrepared={isPrepared ? () => run(togglePreparedSpell(token, sp.index)) : undefined}
-                  onCast={() => run(castSpell(token, sp))}
+                  onCast={() => cast(sp)}
                   onForget={() => run(forgetSpell(token, sp.index))}
                 />
               );

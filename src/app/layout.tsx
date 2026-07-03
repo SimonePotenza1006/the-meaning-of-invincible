@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { roboto, displayFont } from '@/lib/fonts';
+import { roboto, displayFont, handFont } from '@/lib/fonts';
 
 export const metadata: Metadata = {
   title: 'Creazione Personaggio — D&D 5e',
@@ -16,7 +16,7 @@ export default function RootLayout({
   return (
     <html
       lang="it"
-      className={`${roboto.variable} ${displayFont.variable} h-full antialiased`}
+      className={`${roboto.variable} ${displayFont.variable} ${handFont.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">{children}</body>
     </html>
