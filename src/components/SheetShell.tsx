@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from 'react';
 import { cn } from '@/app/crea/ui';
 import { RollEffects } from '@/components/RollEffects';
+import { WildMagicDialog } from '@/components/WildMagicDialog';
 
 export interface ShellSection {
   id: string;
@@ -28,6 +29,7 @@ export function SheetShell({
   sections,
   banner,
   aside,
+  rightRail,
   log,
 }: {
   eyebrow?: string;
@@ -37,6 +39,8 @@ export function SheetShell({
   sections: ShellSection[];
   banner?: ReactNode;
   aside?: ReactNode;
+  /** Persistent quick-access rail pinned to the right edge (DM dashboard). */
+  rightRail?: ReactNode;
   log: ReactNode;
 }) {
   const visible = sections.filter((s) => !s.hidden);
@@ -46,6 +50,7 @@ export function SheetShell({
   return (
     <div className="flex h-[100dvh] overflow-hidden">
       <RollEffects />
+      <WildMagicDialog />
       {/* Sidebar */}
       <aside className="flex w-16 shrink-0 flex-col border-r border-ink-border bg-ink-raised/40 sm:w-56">
         <div className="border-b border-ink-border px-2 py-4 text-center sm:px-4 sm:text-left">
@@ -102,6 +107,13 @@ export function SheetShell({
           <div className="flex-1 overflow-y-auto px-4 pb-3 pt-1">{log}</div>
         </section>
       </div>
+
+      {/* Persistent quick-access rail (right edge) */}
+      {rightRail && (
+        <aside className="flex w-14 shrink-0 flex-col items-center gap-1 overflow-y-auto border-l border-ink-border bg-ink-raised/40 py-2">
+          {rightRail}
+        </aside>
+      )}
     </div>
   );
 }

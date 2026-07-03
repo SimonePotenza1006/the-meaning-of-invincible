@@ -17,6 +17,7 @@ import { buildNpc, type NpcInput } from '@/lib/character/npc';
 import { applyItemStats } from '@/lib/character/items';
 import type { MagicItem, MagicItemEffect } from '@/lib/sheet';
 import type { SaveResult } from '@/lib/game/types';
+import { OMEN_PRESETS, type OmenType } from '@/lib/game/omens';
 
 function token(): string {
   return crypto.randomUUID().replace(/-/g, '');
@@ -624,6 +625,47 @@ export async function recordRoll(
     kind: 'roll',
     message: `${payload.label}: ${payload.detail} = ${payload.total}`,
     data: { ...payload, secret },
+  });
+  return { ok: true };
+}
+
+// ─── Wild Magic surge (rolled client-side on the Wilder table) ─────────────
+export async function recordWildMagic(
+  tok: string,
+  payload: { roll: number; effect: string; source?: string; secret?: boolean },
+) {
+  const found = await findByToken(tok);
+  if (!found) throw new Error('Campagna non trovata.');
+  // As with rolls, only the DM can keep a surge secret from the player.
+  const secret = !!payload.secret && found.role === 'dm';
+  const src = payload.source ? ` · ${payload.source}` : '';
+  await db.insert(events).values({
+    campaignId: found.campaign.id,
+    actor: found.role,
+    kind: 'wildmagic',
+    message: `🌀 Magia Selvaggia (d100 = ${payload.roll})${src}: ${payload.effect}`,
+    data: { ...payload, secret },
+  });
+  return { ok: true };
+}
+
+// ─── DM: push a themed omen/message onto the player's screen ────────────────
+export async function sendOmen(
+  dmToken: string,
+  payload: { type: OmenType; message?: string },
+) {
+  const found = await findByToken(dmToken);
+  if (!found) throw new Error('Campagna non trovata.');
+  if (found.role !== 'dm') throw new Error('Solo il DM può inviare presagi.');
+  const preset = OMEN_PRESETS[payload.type];
+  if (!preset) throw new Error('Presagio sconosciuto.');
+  const message = payload.message?.trim() || undefined;
+  await db.insert(events).values({
+    campaignId: found.campaign.id,
+    actor: 'dm',
+    kind: 'omen',
+    message: `${preset.glyph} ${preset.label}${message ? `: “${message}”` : ''}`,
+    data: { type: payload.type, message },
   });
   return { ok: true };
 }

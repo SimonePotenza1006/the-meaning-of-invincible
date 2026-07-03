@@ -1,31 +1,41 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import {
   GiBattleGear,
   GiCog,
   GiCrossedSwords,
+  GiCrystalBall,
   GiDiceTwentyFacesTwenty,
+  GiHearts,
   GiNotebook,
   GiOpenBook,
+  GiPerspectiveDiceSixFacesRandom,
   GiPotionBall,
+  GiRollingDices,
   GiScrollUnfurled,
   GiSkullCrossedBones,
+  GiSparkles,
   GiSpellBook,
   GiSwapBag,
+  GiThirdEye,
   GiThreeFriends,
+  GiTrophy,
 } from 'react-icons/gi';
 import { ABILITIES, formatMod } from '@/lib/rules';
 import { ABILITY_LABELS, ABILITY_SHORT, CONDITIONS, SKILL_LABELS, skillLabel } from '@/lib/dnd';
 import { abilityMod, initiativeMod, saveMod, skillMod } from '@/lib/character/derive-sheet';
 import { useCampaignState } from '@/lib/game/client';
 import { performDice, performRoll, type Adv } from '@/lib/game/roll';
+import { castWildMagic } from '@/lib/game/wild-magic';
+import { OMEN_PRESETS, OMEN_TYPES, type OmenType } from '@/lib/game/omens';
 import {
   changeHp,
   grantXp,
   levelUp,
   requestRoll,
   saveDmNotes,
+  sendOmen,
   setInspiration,
   toggleCondition,
 } from '@/app/game-actions';
@@ -41,6 +51,7 @@ import { ConsumablesCatalogPanel } from '@/components/ConsumablesCatalogPanel';
 import { NotesPanel } from '@/components/NotesPanel';
 import { NpcPanel } from '@/components/NpcPanel';
 import type { CampaignState } from '@/lib/game/repo';
+import type { CharacterSheet } from '@/lib/sheet';
 
 const DICE = ['d20', 'd12', 'd10', 'd8', 'd6', 'd4'];
 const SKILL_KEYS = Object.keys(SKILL_LABELS).sort((a, b) =>
@@ -294,6 +305,22 @@ export function DmDashboard({ token, initial }: { token: string; initial: Campai
         <RequestForm token={token} adv={adv} onDone={refresh} />
       </Panel>
 
+      <Panel title="Magia Selvaggia">
+        <p className="mb-2 text-xs text-parchment-dim">
+          Tira sulla tabella “The Wilder” (d100).{' '}
+          {secret
+            ? 'Il risultato resta nascosto al giocatore.'
+            : 'Il risultato comparirà anche nella cronaca del giocatore.'}
+        </p>
+        <button
+          type="button"
+          onClick={() => run(castWildMagic(token, { source: 'Tiro del Master', secret }))}
+          className="w-full rounded-lg border border-gold/60 px-3 py-2 text-sm text-parchment hover:border-gold"
+        >
+          🌀 Tira Magia Selvaggia
+        </button>
+      </Panel>
+
       <Panel title="Esperienza">
         <div className="flex flex-wrap gap-2">
           {[25, 50, 100, 300].map((x) => (
@@ -399,6 +426,12 @@ export function DmDashboard({ token, initial }: { token: string; initial: Campai
       content: <NpcPanel token={token} npcs={state.campaign.npcs ?? []} refresh={refresh} />,
     },
     {
+      id: 'presagi',
+      label: 'Presagi',
+      icon: <GiThirdEye />,
+      content: <OmenComposer token={token} run={run} />,
+    },
+    {
       id: 'note',
       label: 'Note',
       icon: <GiNotebook />,
@@ -425,6 +458,18 @@ export function DmDashboard({ token, initial }: { token: string; initial: Campai
       }
       sections={sections}
       aside={<TokenBox label="Link giocatore" path={`/play/${state.campaign.playerToken}`} />}
+      rightRail={
+        <DmQuickAccess
+          token={token}
+          run={run}
+          refresh={refresh}
+          adv={adv}
+          setAdv={setAdv}
+          secret={secret}
+          setSecret={setSecret}
+          sheet={sheet}
+        />
+      }
       log={<LogFeed events={state.events} />}
     />
   );
@@ -543,6 +588,69 @@ function EnemyAttack({
   );
 }
 
+function OmenComposer({
+  token,
+  run,
+}: {
+  token: string;
+  run: (p: Promise<unknown>) => Promise<void>;
+}) {
+  const [message, setMessage] = useState('');
+  const trimmed = message.trim();
+
+  const send = (type: OmenType) => {
+    if (OMEN_PRESETS[type].requiresText && !trimmed) return;
+    run(sendOmen(token, { type, message: trimmed })).then(() => setMessage(''));
+  };
+
+  return (
+    <Panel title="Presagi e messaggi">
+      <p className="mb-3 text-xs text-parchment-dim">
+        Scrivi il testo e invia un presagio: comparirà a tutto schermo sulla scheda della
+        giocatrice, con la sua atmosfera. Per <span className="text-parchment">Voci nella tua testa</span>{' '}
+        il testo sono le parole che sente (obbligatorio); per gli altri è facoltativo.
+      </p>
+      <textarea
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        rows={3}
+        maxLength={400}
+        placeholder="Le parole nella sua testa, o ciò che percepisce…"
+        className="w-full resize-none rounded-lg border border-ink-border bg-[color:var(--color-ink)] px-3 py-2 text-sm text-parchment placeholder:text-parchment-dim/60 focus:border-gold focus:outline-none"
+      />
+      {(['presagio', 'messaggio'] as const).map((group) => (
+        <div key={group} className="mt-3">
+          <p className="mb-1.5 text-xs font-semibold uppercase tracking-[0.15em] text-ochre">
+            {group === 'presagio' ? 'Presagi' : 'Messaggi'}
+          </p>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {OMEN_TYPES.filter((type) => OMEN_PRESETS[type].group === group).map((type) => {
+              const preset = OMEN_PRESETS[type];
+              const disabled = preset.requiresText && !trimmed;
+              return (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => send(type)}
+                  disabled={disabled}
+                  title={disabled ? 'Scrivi prima il testo' : undefined}
+                  className="flex items-center gap-2 rounded-lg border border-ink-border px-3 py-2.5 text-left text-sm text-parchment transition-colors hover:border-gold disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  <span className="text-lg leading-none">{preset.glyph}</span>
+                  <span>{preset.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+      <p className="mt-2 text-[11px] text-parchment-dim">
+        Usa i presagi con parsimonia: se il marchio prude, qualcosa di segnato è davvero vicino.
+      </p>
+    </Panel>
+  );
+}
+
 function RequestForm({
   token,
   adv,
@@ -607,4 +715,319 @@ function RequestForm({
       </button>
     </div>
   );
+}
+
+// ─── Quick-access rail (right edge, always visible across all sections) ─────
+type QuickTool =
+  | 'request'
+  | 'dice'
+  | 'enemy'
+  | 'wild'
+  | 'omen'
+  | 'hp'
+  | 'conditions'
+  | 'inspiration'
+  | 'progression'
+  | 'rollmode';
+
+interface QuickAccessProps {
+  token: string;
+  run: (p: Promise<unknown>) => Promise<void>;
+  refresh: () => void;
+  adv: Adv;
+  setAdv: (a: Adv) => void;
+  secret: boolean;
+  setSecret: (v: boolean) => void;
+  sheet: CharacterSheet;
+}
+
+const QUICK_TOOLS: { id: QuickTool; label: string; icon: ReactNode }[] = [
+  { id: 'request', label: 'Richiedi un tiro', icon: <GiPerspectiveDiceSixFacesRandom /> },
+  { id: 'dice', label: 'Dadi', icon: <GiRollingDices /> },
+  { id: 'enemy', label: 'Attacco nemico', icon: <GiCrossedSwords /> },
+  { id: 'wild', label: 'Magia Selvaggia', icon: <GiCrystalBall /> },
+  { id: 'omen', label: 'Presagi e messaggi', icon: <GiThirdEye /> },
+  { id: 'hp', label: 'Punti Ferita', icon: <GiHearts /> },
+  { id: 'conditions', label: 'Stati e condizioni', icon: <GiSkullCrossedBones /> },
+  { id: 'inspiration', label: 'Ispirazione', icon: <GiSparkles /> },
+  { id: 'progression', label: 'Esperienza e livello', icon: <GiTrophy /> },
+  { id: 'rollmode', label: 'Modalità di tiro', icon: <GiCog /> },
+];
+
+function DmQuickAccess(props: QuickAccessProps) {
+  const { secret } = props;
+  const [open, setOpen] = useState<QuickTool | null>(null);
+
+  return (
+    <>
+      <span className="mb-1 select-none text-[8px] uppercase tracking-wider text-parchment-dim">Rapido</span>
+      {QUICK_TOOLS.map((t) => {
+        const on = open === t.id;
+        const flagged = t.id === 'rollmode' && secret;
+        return (
+          <button
+            key={t.id}
+            type="button"
+            title={t.label}
+            aria-label={t.label}
+            onClick={() => setOpen(t.id)}
+            className={cn(
+              'relative flex h-11 w-11 items-center justify-center rounded-lg text-xl transition-colors',
+              on ? 'bg-burgundy/50 text-gold' : 'text-ochre hover:bg-ink-raised hover:text-gold',
+            )}
+          >
+            {t.icon}
+            {flagged && <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-flag-red" />}
+          </button>
+        );
+      })}
+
+      {open && (
+        <QuickDialog onClose={() => setOpen(null)}>
+          <QuickToolBody {...props} tool={open} />
+        </QuickDialog>
+      )}
+    </>
+  );
+}
+
+// A right-anchored drawer, dismissable by backdrop click or Escape. Sits below
+// the roll/wild-magic overlays so their flourishes still show on top.
+function QuickDialog({ onClose, children }: { onClose: () => void; children: ReactNode }) {
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  return (
+    <div className="fixed inset-0 z-[55] flex justify-end bg-black/50 backdrop-blur-sm" onClick={onClose}>
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative flex h-full w-full max-w-sm flex-col overflow-y-auto border-l-2 border-gold/40 bg-ink p-4 shadow-[0_0_60px_-10px_rgba(0,0,0,0.85)]"
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Chiudi"
+          className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-ink-border text-parchment-dim transition-colors hover:border-flag-red hover:text-flag-red"
+        >
+          ✕
+        </button>
+        <div className="mt-1 space-y-4">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+function QuickToolBody({
+  tool,
+  token,
+  run,
+  refresh,
+  adv,
+  setAdv,
+  secret,
+  setSecret,
+  sheet,
+}: QuickAccessProps & { tool: QuickTool }) {
+  switch (tool) {
+    case 'request':
+      return (
+        <Panel title="Richiedi un tiro">
+          <div className="mb-3">
+            <p className="mb-2 text-xs uppercase tracking-wide text-parchment-dim">Modalità di tiro</p>
+            <AdvToggle value={adv} onChange={setAdv} />
+          </div>
+          <RequestForm token={token} adv={adv} onDone={refresh} />
+        </Panel>
+      );
+
+    case 'dice':
+      return (
+        <Panel title="Dadi">
+          <div className="mb-3">
+            <p className="mb-2 text-xs uppercase tracking-wide text-parchment-dim">Modalità di tiro</p>
+            <AdvToggle value={adv} onChange={setAdv} />
+          </div>
+          <button
+            type="button"
+            onClick={() => run(performRoll(token, 'd20 (DM)', 0, adv, undefined, secret))}
+            className="mb-3 w-full rounded-lg border border-gold/60 px-3 py-2 text-sm text-parchment hover:border-gold"
+          >
+            Tira d20 (usa la modalità)
+          </button>
+          <div className="flex flex-wrap gap-2">
+            {DICE.map((d) => (
+              <button
+                key={d}
+                type="button"
+                onClick={() => run(performDice(token, d, secret))}
+                className="rounded-md border border-ink-border px-3 py-1.5 text-sm text-parchment hover:border-gold"
+              >
+                {d}
+              </button>
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-parchment-dim">
+            {secret ? 'I tiri restano nascosti al giocatore.' : 'I tiri compaiono nella cronaca del giocatore.'}
+          </p>
+        </Panel>
+      );
+
+    case 'enemy':
+      return <EnemyAttack token={token} adv={adv} secret={secret} run={run} />;
+
+    case 'wild':
+      return (
+        <Panel title="Magia Selvaggia">
+          <p className="mb-2 text-xs text-parchment-dim">
+            Tira sulla tabella “The Wilder” (d100).{' '}
+            {secret ? 'Il risultato resta nascosto al giocatore.' : 'Il risultato comparirà nella cronaca del giocatore.'}
+          </p>
+          <button
+            type="button"
+            onClick={() => run(castWildMagic(token, { source: 'Tiro del Master', secret }))}
+            className="w-full rounded-lg border border-gold/60 px-3 py-2 text-sm text-parchment hover:border-gold"
+          >
+            🌀 Tira Magia Selvaggia
+          </button>
+        </Panel>
+      );
+
+    case 'omen':
+      return <OmenComposer token={token} run={run} />;
+
+    case 'hp':
+      return (
+        <Panel title="Punti Ferita">
+          <HpBar current={sheet.combat.currentHp} max={sheet.combat.maxHp} temp={sheet.combat.tempHp} />
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            {[-5, -1, 1, 5].map((d) => (
+              <button
+                key={d}
+                type="button"
+                onClick={() => run(changeHp(token, d))}
+                className="rounded-md border border-ink-border px-2.5 py-1 text-sm text-parchment hover:border-gold"
+              >
+                {d > 0 ? `+${d}` : d}
+              </button>
+            ))}
+            <HpAmount onDamage={(n) => run(changeHp(token, -n))} onHeal={(n) => run(changeHp(token, n))} />
+          </div>
+        </Panel>
+      );
+
+    case 'conditions':
+      return (
+        <Panel title="Stati e condizioni">
+          <p className="mb-3 text-xs text-parchment-dim">Tocca uno stato per assegnarlo o rimuoverlo.</p>
+          <div className="flex flex-wrap gap-2">
+            {CONDITIONS.map((c) => (
+              <Chip
+                key={c}
+                label={c}
+                selected={sheet.conditions.includes(c)}
+                onClick={() => run(toggleCondition(token, c))}
+              />
+            ))}
+          </div>
+        </Panel>
+      );
+
+    case 'inspiration':
+      return (
+        <Panel title="Ispirazione">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-sm">
+              <span className="text-ochre">Stato: </span>
+              <span className={sheet.inspiration ? 'text-gold' : 'text-parchment-dim'}>
+                {sheet.inspiration ? '✦ attiva' : 'assente'}
+              </span>
+            </span>
+            <button
+              type="button"
+              onClick={() => run(setInspiration(token, !sheet.inspiration))}
+              className="rounded-lg border border-gold/60 px-3 py-1.5 text-sm text-parchment hover:border-gold"
+            >
+              {sheet.inspiration ? 'Rimuovi' : 'Concedi ✦'}
+            </button>
+          </div>
+        </Panel>
+      );
+
+    case 'progression':
+      return (
+        <Panel title="Esperienza e livello">
+          <p className="mb-2 text-sm text-parchment-dim">
+            PE attuali: <span className="text-parchment">{sheet.identity.xp}</span> · Livello{' '}
+            <span className="font-semibold text-gold">{sheet.identity.level}</span>
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {[25, 50, 100, 300].map((x) => (
+              <button
+                key={x}
+                type="button"
+                onClick={() => run(grantXp(token, x))}
+                className="rounded-md border border-ink-border px-2.5 py-1 text-sm text-parchment hover:border-gold"
+              >
+                +{x}
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            disabled={sheet.identity.level >= 20}
+            onClick={() => run(levelUp(token))}
+            className="mt-3 w-full rounded-lg bg-gold px-3 py-1.5 text-sm font-medium text-[color:var(--color-ink)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Sali di livello ▲
+          </button>
+          {sheet.pendingLevelUp && (
+            <p className="mt-2 text-xs text-gold">
+              In attesa che il giocatore sistemi il livello {sheet.pendingLevelUp.level}.
+            </p>
+          )}
+        </Panel>
+      );
+
+    case 'rollmode':
+      return (
+        <Panel title="Modalità di tiro">
+          <AdvToggle value={adv} onChange={setAdv} />
+          <p className="mt-2 text-xs text-parchment-dim">Vale per i tuoi tiri e per le richieste al giocatore.</p>
+          <button
+            type="button"
+            onClick={() => setSecret(!secret)}
+            aria-pressed={secret}
+            className={cn(
+              'mt-3 flex w-full items-center justify-between rounded-lg border px-3 py-2.5 text-sm transition-colors',
+              secret
+                ? 'border-gold bg-burgundy/40 text-parchment'
+                : 'border-ink-border text-parchment-dim hover:border-ochre',
+            )}
+          >
+            <span>{secret ? '🙈 Tiri nascosti al giocatore' : '👁 Tiri visibili al giocatore'}</span>
+            <span
+              className={cn(
+                'ml-2 inline-flex h-5 w-9 items-center rounded-full p-0.5 transition-colors',
+                secret ? 'bg-gold' : 'bg-ink-border',
+              )}
+            >
+              <span
+                className={cn(
+                  'h-4 w-4 rounded-full bg-[color:var(--color-ink)] transition-transform',
+                  secret ? 'translate-x-4' : 'translate-x-0',
+                )}
+              />
+            </span>
+          </button>
+        </Panel>
+      );
+
+    default:
+      return null;
+  }
 }
