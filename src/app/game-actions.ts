@@ -757,6 +757,35 @@ export async function updateNpc(dmToken: string, id: string, input: NpcInput) {
   return { ok: true };
 }
 
+/** Bump a roster NPC up one level, recomputing HP/proficiency and refilling HP. */
+export async function levelUpNpc(dmToken: string, id: string) {
+  const found = await requireDm(dmToken);
+  const list = found.campaign.npcs ?? [];
+  const prev = list.find((n) => n.id === id);
+  if (!prev) throw new Error('NPC non trovato.');
+  if (prev.level >= 20) throw new Error('L’NPC è già al livello massimo.');
+  // Omit currentHp so the rebuild refills to the new maximum (a fresh level-up).
+  const rebuilt = buildNpc(
+    {
+      name: prev.name,
+      raceKey: prev.raceKey,
+      classKey: prev.classKey,
+      subclassKey: prev.subclassKey ?? null,
+      level: prev.level + 1,
+    },
+    { id, notes: prev.notes },
+  );
+  const npcs = list.map((n) => (n.id === id ? rebuilt : n));
+  await db.update(campaigns).set({ npcs }).where(eq(campaigns.id, found.campaign.id));
+  await db.insert(events).values({
+    campaignId: found.campaign.id,
+    actor: 'dm',
+    kind: 'note',
+    message: `${rebuilt.name} sale al livello ${rebuilt.level}.`,
+  });
+  return { ok: true };
+}
+
 /** Adjust an NPC's current HP (and, optionally, its notes) without a full rebuild. */
 export async function patchNpc(
   dmToken: string,

@@ -178,6 +178,61 @@ export async function addCustomCombatant(
   return { ok: true };
 }
 
+/** Drop a roster NPC (e.g. Aldric) into the current encounter as an ally or enemy. */
+export async function addNpcCombatant(
+  dmToken: string,
+  npcId: string,
+  side: 'enemy' | 'ally',
+) {
+  const { campaign } = await requireDm(dmToken);
+  const enc = await activeEncounter(campaign.id);
+  if (!enc) throw new Error('Nessun incontro in preparazione.');
+  const npc = (campaign.npcs ?? []).find((n) => n.id === npcId);
+  if (!npc) throw new Error('NPC non trovato nel registro.');
+
+  const existing = await db
+    .select({ id: combatants.id })
+    .from(combatants)
+    .where(eq(combatants.encounterId, enc.id));
+
+  const description =
+    `${npc.race} · ${npc.className}${npc.subclass ? ` (${npc.subclass})` : ''} · Livello ${npc.level}. ` +
+    `CA ${npc.armorClass}, PF ${npc.maxHp}, competenza ${sign(npc.proficiencyBonus)}.` +
+    (npc.notes ? `\n${npc.notes}` : '');
+
+  await db.insert(combatants).values({
+    encounterId: enc.id,
+    name: npc.name,
+    side,
+    sourceType: 'npc',
+    maxHp: npc.maxHp,
+    currentHp: npc.currentHp ?? npc.maxHp,
+    ac: npc.armorClass,
+    initMod: mod(npc.abilities.DEX),
+    statblock: {
+      npcId: npc.id,
+      speed: `${npc.speed} m`,
+      description,
+      abilities: {
+        str: npc.abilities.STR,
+        dex: npc.abilities.DEX,
+        con: npc.abilities.CON,
+        int: npc.abilities.INT,
+        wis: npc.abilities.WIS,
+        cha: npc.abilities.CHA,
+      },
+    },
+    sortIndex: existing.length + 1,
+  });
+  await log(
+    campaign.id,
+    'dm',
+    'note',
+    `Aggiunto ${npc.name} dal registro (${side === 'enemy' ? 'nemico' : 'alleato'}).`,
+  );
+  return { ok: true };
+}
+
 export async function removeCombatant(dmToken: string, combatantId: number) {
   await requireDm(dmToken);
   await db.delete(combatants).where(eq(combatants.id, combatantId));

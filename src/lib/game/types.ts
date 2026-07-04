@@ -40,6 +40,8 @@ export interface Npc {
 /** Snapshot of a monster/NPC stat block stored on a combatant. */
 export interface CombatantStatblock {
   index?: string;
+  /** Set when the combatant was spawned from a roster NPC (links back to Npc.id). */
+  npcId?: string;
   type?: string;
   size?: string;
   cr?: number;

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { ABILITY_SHORT, CLASSES, RACES, getSubclasses } from '@/lib/dnd';
 import { ABILITIES, formatMod, modifier } from '@/lib/rules';
-import { addNpc, patchNpc, removeNpc, updateNpc } from '@/app/game-actions';
+import { addNpc, levelUpNpc, patchNpc, removeNpc, updateNpc } from '@/app/game-actions';
 import { Panel, cn } from '@/app/crea/ui';
 import type { Npc } from '@/lib/game/types';
 
@@ -170,6 +170,7 @@ export function NpcPanel({
                 npc={n}
                 onEdit={() => editNpc(n)}
                 onRemove={() => run(removeNpc(token, n.id))}
+                onLevelUp={() => run(levelUpNpc(token, n.id))}
                 onHp={(hp) => run(patchNpc(token, n.id, { currentHp: hp }))}
                 onNotes={(notes) => run(patchNpc(token, n.id, { notes }))}
               />
@@ -185,12 +186,14 @@ function NpcCard({
   npc: n,
   onEdit,
   onRemove,
+  onLevelUp,
   onHp,
   onNotes,
 }: {
   npc: Npc;
   onEdit: () => void;
   onRemove: () => void;
+  onLevelUp: () => void;
   onHp: (hp: number) => void;
   onNotes: (notes: string) => void;
 }) {
@@ -215,6 +218,15 @@ function NpcCard({
           </p>
         </div>
         <div className="flex shrink-0 gap-1.5">
+          <button
+            type="button"
+            onClick={onLevelUp}
+            disabled={n.level >= 20}
+            title={n.level >= 20 ? 'Livello massimo' : 'Sali di livello'}
+            className="rounded-md border border-gold/60 px-2 py-1 text-xs text-gold hover:border-gold disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            Liv +1
+          </button>
           <button
             type="button"
             onClick={onEdit}

@@ -5,6 +5,7 @@ import { CONDITIONS, TERRAINS } from '@/lib/dnd';
 import {
   addCustomCombatant,
   addMonsterCombatant,
+  addNpcCombatant,
   createEncounter,
   damageCombatant,
   endEncounter,
@@ -31,6 +32,7 @@ import { MonsterBrowser } from './MonsterBrowser';
 import { SceneHeader } from './SceneHeader';
 import type { CampaignState } from '@/lib/game/repo';
 import type { Combatant } from '@/db';
+import type { Npc } from '@/lib/game/types';
 
 type Run = (p: Promise<unknown>) => Promise<void>;
 
@@ -164,6 +166,8 @@ function EncounterBuilder({ token, state, run }: { token: string; state: Campaig
         <MonsterBrowser onAdd={(index, side, count) => run(addMonsterCombatant(token, index, side, count))} />
       </div>
 
+      <NpcRosterAdd token={token} npcs={state.campaign.npcs ?? []} run={run} />
+
       <CustomCombatantForm token={token} run={run} />
 
       <button
@@ -222,6 +226,53 @@ function CustomCombatantForm({ token, run }: { token: string; run: Run }) {
           Aggiungi
         </button>
       </div>
+    </details>
+  );
+}
+
+function NpcRosterAdd({ token, npcs, run }: { token: string; npcs: Npc[]; run: Run }) {
+  const [npcId, setNpcId] = useState('');
+  const [side, setSide] = useState<'enemy' | 'ally'>('ally');
+
+  return (
+    <details className="rounded-lg border border-ink-border bg-ink-raised p-3">
+      <summary className="cursor-pointer text-sm text-parchment">NPC dal registro</summary>
+      {npcs.length === 0 ? (
+        <p className="mt-3 text-sm text-parchment-dim">
+          Nessun NPC nel registro. Creane uno nella sezione <span className="text-ochre">NPC</span> (es. Aldric),
+          poi aggiungilo qui come alleato.
+        </p>
+      ) : (
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <select
+            value={npcId}
+            onChange={(e) => setNpcId(e.target.value)}
+            className={cn(inputClass, 'flex-1')}
+          >
+            <option value="">— Scegli un NPC —</option>
+            {npcs.map((n) => (
+              <option key={n.id} value={n.id}>
+                {n.name} · {n.className} liv {n.level}
+              </option>
+            ))}
+          </select>
+          <select value={side} onChange={(e) => setSide(e.target.value as 'enemy' | 'ally')} className={inputClass}>
+            <option value="ally">Alleato</option>
+            <option value="enemy">Nemico</option>
+          </select>
+          <button
+            type="button"
+            disabled={!npcId}
+            onClick={() => {
+              run(addNpcCombatant(token, npcId, side));
+              setNpcId('');
+            }}
+            className="rounded-lg border border-ochre/60 px-3 py-2 text-sm text-parchment hover:border-ochre disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            Aggiungi
+          </button>
+        </div>
+      )}
     </details>
   );
 }
@@ -288,8 +339,9 @@ function ActiveCombat({
 
       <details className="mt-4 rounded-lg border border-ink-border bg-ink-raised p-3">
         <summary className="cursor-pointer text-sm text-parchment">Aggiungi combattenti</summary>
-        <div className="mt-3">
+        <div className="mt-3 space-y-3">
           <MonsterBrowser onAdd={(index, side, count) => run(addMonsterCombatant(token, index, side, count))} />
+          <NpcRosterAdd token={token} npcs={state.campaign.npcs ?? []} run={run} />
         </div>
       </details>
       </Panel>
