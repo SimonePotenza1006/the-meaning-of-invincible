@@ -12,6 +12,8 @@ import {
   updateSpellSlot,
 } from '@/app/game-actions';
 import { castWildMagic } from '@/lib/game/wild-magic';
+import { performDice, performRoll } from '@/lib/game/roll';
+import { SPELL_DAMAGE, spellDamageFormula } from '@/lib/spells/damage';
 import { Panel, cn } from '@/app/crea/ui';
 import { StatTile, Stepper } from '@/components/game';
 import { ActionGlyph, ActionLegend } from '@/components/action-cost';
@@ -102,6 +104,14 @@ export function SpellsPanel({
       </p>
       <ActionLegend className="mt-1.5" />
 
+      <p className="mt-1.5 text-[11px] leading-relaxed text-parchment-dim">
+        <span className="text-ochre">Come si tira:</span> per colpire{' '}
+        <span className="text-parchment">d20 {formatMod(sc.spellAttackBonus ?? 0)}</span> (attacco magico); i
+        trucchetti raddoppiano/triplicano i dadi ai livelli 5/11/17; per gli incantesimi con tiro salvezza il
+        bersaglio tira <span className="text-parchment">TS contro CD {sc.spellSaveDc ?? '—'}</span>, in caso di
+        fallimento subisce il danno.
+      </p>
+
       {/* Slots */}
       {sc.slots.map((slot) => (
         <div key={slot.level} className="mt-3 flex items-center justify-between">
@@ -124,6 +134,11 @@ export function SpellsPanel({
                 key={sp.index}
                 spell={sp}
                 canCast
+                token={token}
+                charLevel={sheet.identity.level}
+                attackBonus={sc.spellAttackBonus}
+                saveDc={sc.spellSaveDc}
+                run={run}
                 onCast={() => cast(sp)}
                 onForget={() => run(forgetSpell(token, sp.index))}
               />
@@ -147,6 +162,11 @@ export function SpellsPanel({
                   key={sp.index}
                   spell={sp}
                   canCast={canCast}
+                  token={token}
+                  charLevel={sheet.identity.level}
+                  attackBonus={sc.spellAttackBonus}
+                  saveDc={sc.spellSaveDc}
+                  run={run}
                   prepared={isPrepared ? prep : undefined}
                   onTogglePrepared={isPrepared ? () => run(togglePreparedSpell(token, sp.index)) : undefined}
                   onCast={() => cast(sp)}
@@ -182,6 +202,11 @@ export function SpellsPanel({
 function SpellRow({
   spell,
   canCast,
+  token,
+  charLevel,
+  attackBonus,
+  saveDc,
+  run,
   prepared,
   onCast,
   onForget,
@@ -189,46 +214,80 @@ function SpellRow({
 }: {
   spell: KnownSpell;
   canCast: boolean;
+  token: string;
+  charLevel: number;
+  attackBonus?: number;
+  saveDc?: number;
+  run: (p: Promise<unknown>) => Promise<void>;
   prepared?: boolean;
   onCast: () => void;
   onForget: () => void;
   onTogglePrepared?: () => void;
 }) {
+  const dmg = SPELL_DAMAGE[spell.index];
+  const formula = dmg ? spellDamageFormula(dmg, charLevel) : null;
   return (
-    <li className="flex items-center justify-between gap-2 rounded-lg border border-ink-border bg-ink-raised px-3 py-1.5">
-      <div className="flex min-w-0 items-center gap-2">
-        {onTogglePrepared && (
+    <li className="rounded-lg border border-ink-border bg-ink-raised px-3 py-1.5">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2">
+          {onTogglePrepared && (
+            <button
+              type="button"
+              aria-label="Prepara"
+              onClick={onTogglePrepared}
+              className={cn('shrink-0 text-lg leading-none', prepared ? 'text-gold' : 'text-parchment-dim')}
+            >
+              {prepared ? '★' : '☆'}
+            </button>
+          )}
+          <ActionGlyph cost={spell.action ?? 'action'} className="shrink-0" />
+          <span className="truncate text-parchment">{spell.name}</span>
+          {spell.level > 0 && <span className="shrink-0 text-xs text-parchment-dim">L{spell.level}</span>}
+        </div>
+        <div className="flex shrink-0 items-center gap-1.5">
           <button
             type="button"
-            aria-label="Prepara"
-            onClick={onTogglePrepared}
-            className={cn('shrink-0 text-lg leading-none', prepared ? 'text-gold' : 'text-parchment-dim')}
+            disabled={!canCast}
+            onClick={onCast}
+            className="rounded-md border border-gold/60 px-2.5 py-0.5 text-sm text-parchment hover:border-gold disabled:opacity-30"
           >
-            {prepared ? '★' : '☆'}
+            Lancia
           </button>
-        )}
-        <ActionGlyph cost={spell.action ?? 'action'} className="shrink-0" />
-        <span className="truncate text-parchment">{spell.name}</span>
-        {spell.level > 0 && <span className="shrink-0 text-xs text-parchment-dim">L{spell.level}</span>}
+          <button
+            type="button"
+            aria-label="Dimentica"
+            onClick={onForget}
+            className="rounded-md border border-ink-border px-2 py-0.5 text-sm text-parchment-dim hover:border-flag-red hover:text-flag-red"
+          >
+            ✕
+          </button>
+        </div>
       </div>
-      <div className="flex shrink-0 items-center gap-1.5">
-        <button
-          type="button"
-          disabled={!canCast}
-          onClick={onCast}
-          className="rounded-md border border-gold/60 px-2.5 py-0.5 text-sm text-parchment hover:border-gold disabled:opacity-30"
-        >
-          Lancia
-        </button>
-        <button
-          type="button"
-          aria-label="Dimentica"
-          onClick={onForget}
-          className="rounded-md border border-ink-border px-2 py-0.5 text-sm text-parchment-dim hover:border-flag-red hover:text-flag-red"
-        >
-          ✕
-        </button>
-      </div>
+
+      {dmg && formula && (
+        <div className="mt-1.5 flex flex-wrap items-center gap-1.5 border-t border-ink-border/60 pt-1.5">
+          {dmg.attack ? (
+            <button
+              type="button"
+              onClick={() => run(performRoll(token, `${spell.name} · colpire`, attackBonus ?? 0, 'normal'))}
+              className="rounded-md border border-gold/60 px-2 py-0.5 text-xs text-parchment hover:border-gold"
+            >
+              Colpire {formatMod(attackBonus ?? 0)}
+            </button>
+          ) : (
+            <span className="rounded-md border border-ink-border px-2 py-0.5 text-xs text-parchment-dim">
+              TS {dmg.save} · CD {saveDc ?? '—'}
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={() => run(performDice(token, formula))}
+            className="rounded-md border border-ochre/60 px-2 py-0.5 text-xs text-parchment hover:border-ochre"
+          >
+            Danni {formula} {dmg.type}
+          </button>
+        </div>
+      )}
     </li>
   );
 }
